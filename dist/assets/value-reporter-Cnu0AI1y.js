@@ -1,0 +1,1 @@
+import{B as e,V as t,W as n,r}from"./loading-state-n4-87AJA.js";import{S as i}from"./index-BZLZ8Oej.js";var a=e(),o=i(({variant:e,size:t,className:n,...i})=>(0,a.jsx)(`a`,{className:r({variant:e,size:t,className:n}),...i})),s=n(t(),1);function c({value:e,onReport:t}){return(0,s.useEffect)(()=>{t(e)},[e,t]),null}export{o as n,c as t};

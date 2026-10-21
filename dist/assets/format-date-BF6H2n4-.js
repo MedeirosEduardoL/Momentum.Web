@@ -1,0 +1,1 @@
+var e=new Intl.DateTimeFormat(`pt-BR`,{dateStyle:`short`}),t=new Intl.DateTimeFormat(`pt-BR`,{dateStyle:`short`,timeZone:`UTC`});function n(t){return e.format(new Date(t))}function r(e){return t.format(new Date(e))}export{r as n,n as t};

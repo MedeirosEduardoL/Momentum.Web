@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f2f3f6" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Momentum</title>
+    <script>
+      try {
+        if (
+          JSON.parse(localStorage.getItem("momentum-preferences") || "{}").state?.theme === "dark"
+        ) {
+          document.documentElement.dataset.theme = "dark";
+        }
+      } catch {}
+    </script>
+    <script type="module" crossorigin src="/assets/index-BZLZ8Oej.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/loading-state-n4-87AJA.js">
+    <link rel="modulepreload" crossorigin href="/assets/dist-ypUqpf0I.js">
+    <link rel="modulepreload" crossorigin href="/assets/account.queries-DL6AODqW.js">
+    <link rel="modulepreload" crossorigin href="/assets/account.mutations-Cdbd3qFM.js">
+    <link rel="modulepreload" crossorigin href="/assets/fill-path-CNYarx3t.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-B6K3aMSA.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
