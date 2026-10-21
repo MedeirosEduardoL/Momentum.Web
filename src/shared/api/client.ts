@@ -1,4 +1,5 @@
 import axios, { isCancel } from "axios";
+import { API_BASE_URL } from "./api-base-url";
 import { toApiError } from "./api-error";
 import { createSession } from "./session";
 
@@ -11,6 +12,7 @@ function rejectAsApiError(error: unknown) {
 export const REQUESTED_WITH_HEADER = { "X-Requested-With": "XMLHttpRequest" };
 
 export const api = axios.create({
+  baseURL: API_BASE_URL,
   timeout: REQUEST_TIMEOUT_MS,
   withCredentials: true,
   headers: {

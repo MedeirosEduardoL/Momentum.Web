@@ -97,8 +97,9 @@ Do roadmap do produto, para orientar nomes e rotas; cada uma entra em "Telas" qu
 
 - Contrato: `../Momentum.Core/openapi.json`; tipos gerados em
   `src/shared/api/generated/openapi.d.ts` por `npm run api:types`.
-- Mesma origem: chamadas a `/api/...`, sem `baseURL`; no local, o proxy do Vite repassa ao Kong em
-  `127.0.0.1:8010`.
+- Chamadas a `/api/...` com o `baseURL` de `VITE_API_BASE_URL`: vazio no local, onde o proxy do
+  Vite repassa ao Kong em `127.0.0.1:8010`; `https://gateway.infinitemonkey.com.br` no Cloudflare
+  Pages.
 - JSON snake_case na API, camelCase dentro do front, adaptado no service da feature.
 - Erro em `application/problem+json`, convertido em `ApiError` pelo client e tratado pelo `code`.
 - Sessão: cookie httpOnly lido pelo Kong (ADR 0003 do Core); o client manda as credenciais e o

@@ -74,6 +74,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
 });
 
 describe("postEventStream — requisição", () => {
@@ -85,7 +86,7 @@ describe("postEventStream — requisição", () => {
 
     expect(fetchMock).toHaveBeenCalledWith(ROUNDS_PATH, {
       method: "POST",
-      credentials: "same-origin",
+      credentials: "include",
       headers: {
         Accept: "text/event-stream",
         "Content-Type": "application/json",
@@ -94,6 +95,20 @@ describe("postEventStream — requisição", () => {
       body: '{"answers":[{"question":1,"answer":"Sim"}]}',
       signal,
     });
+  });
+
+  it("manda o POST ao endereço de VITE_API_BASE_URL", async () => {
+    vi.stubEnv("VITE_API_BASE_URL", "https://gateway.exemplo.test");
+    vi.resetModules();
+    const { postEventStream: configuredStream } = await import("./event-stream");
+    fetchMock.mockResolvedValue(streamed([]));
+
+    await collect(configuredStream(ROUNDS_PATH, {}, new AbortController().signal));
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      `https://gateway.exemplo.test${ROUNDS_PATH}`,
+      expect.objectContaining({ credentials: "include" })
+    );
   });
 });
 

@@ -101,7 +101,7 @@ aqui, no conhecimento `entrevista-do-card`. Aqui fica o que o código não conta
   de custo também.
 - **Sessão.** O `fetch` não passa pelos interceptors do Axios. `postEventStream` renova a sessão
   no 401 e repete uma vez, pela mesma `session.renewAfter` (conhecimento `renovacao-da-sessao`),
-  e só manda o cookie para a mesma origem.
+  e manda o cookie com `credentials: "include"` ao endereço da API do build.
 - **No Kong, todo `POST` sob `/api/v1/card-interviews`** (iniciar, rodada e proposta) passa pelo
   service de stream: 20 por minuto por sessão e 330 segundos de espera. O 429 dele vem fora do
   formato do Core e já sai do leitor com a mensagem de "muitas tentativas".

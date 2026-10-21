@@ -5,11 +5,16 @@ regras do contrato estão em `.claude/rules/data-layer.md`; aqui fica o que o c�
 
 ## Caminho de uma chamada
 
-- Service da feature → `api` (`src/shared/api/client.ts`) → `/api/v1/...` na mesma origem.
+- Service da feature → `api` (`src/shared/api/client.ts`) → `API_BASE_URL` + `/api/v1/...`.
 - Local: Vite (`npm start`, porta 5173) → proxy `/api` → Kong em `127.0.0.1:8010` → API. O Kong e a
   API sobem pelo `docker compose` do Core (`ai/memory/incremental/plataforma.md` de lá).
-- Produção (D-04): o Kong serve o front em `/` e a API em `/api`, na mesma origem.
-- O `api` não tem `baseURL`: o caminho passado é o mesmo do `openapi.json`. Cada service declara
+- Produção (ADR 0005 do Core): o front fica no Cloudflare Pages, em
+  `momentum.infinitemonkey.com.br`, e a API em `https://gateway.infinitemonkey.com.br`, outra
+  origem do mesmo site. O Kong responde CORS com credenciais só para a origem do front.
+- **`VITE_API_BASE_URL`** é o endereço da API, lido no build (`src/shared/api/api-base-url.ts`):
+  vira o `baseURL` do `api` e o prefixo do stream. Sem ela, fica vazio e tudo vai para a mesma
+  origem, como no local. No Cloudflare Pages ela é variável de build: mudou, precisa de build novo.
+- O caminho passado ao `api` é o mesmo do `openapi.json`. Cada service declara
   o caminho com `satisfies keyof paths`, e rota que sair do contrato quebra o typecheck. Rota com
   parâmetro passa pelo `fillPath`, com o molde do contrato (`/api/v1/projects/{projectId}/members`):
   o molde é conferido contra `paths`, parâmetro que falta quebra o typecheck e o valor é escapado.
@@ -19,8 +24,8 @@ regras do contrato estão em `.claude/rules/data-layer.md`; aqui fica o que o c�
 - Cookie httpOnly (`SameSite=Strict`, `Path=/api`) lido pelo Kong (ADR 0003 do Core). O front não
   lê nem guarda token.
 - `withCredentials` e `X-Requested-With: XMLHttpRequest` estão nos defaults do `api`, em toda
-  requisição: o Core só exige o header nas mutações, mas mandar sempre é mais simples e não custa
-  nada na mesma origem.
+  requisição: o Core só exige o header nas mutações, mas mandar sempre é mais simples. Em outra
+  origem, ele faz toda chamada ter preflight, que o Kong responde sem chegar à API.
 - `session` (`src/shared/api/session.ts`, criada em `client.ts`) é quem fala com as três rotas de
   sessão: `open` (login), `close` (logout) e a renovação. As features não chamam essas rotas por
   conta própria.
@@ -44,8 +49,8 @@ regras do contrato estão em `.claude/rules/data-layer.md`; aqui fica o que o c�
 - `postEventStream` (`src/shared/api/event-stream.ts`) é a única chamada que não passa pelo Axios:
   um `POST` com `fetch`, que lê o corpo `text/event-stream` em pedaços e entrega cada evento como
   `{ event, data }`. Hoje só a rodada da entrevista o usa (`entrevista-do-card.md`).
-- Ele repete à mão o que os defaults e os interceptors do `api` fazem: cookie de sessão (só para
-  a mesma origem, `credentials: "same-origin"`), o mesmo `X-Requested-With` (`REQUESTED_WITH_HEADER`, de `client.ts`), renovação no 401 por
+- Ele repete à mão o que os defaults e os interceptors do `api` fazem: o mesmo `API_BASE_URL`,
+  cookie de sessão (`credentials: "include"`, o `withCredentials` do `fetch`), o mesmo `X-Requested-With` (`REQUESTED_WITH_HEADER`, de `client.ts`), renovação no 401 por
   `session.renewAfter` com uma repetição, e erro convertido em `ApiError` (`fromResponse` para a
   resposta recusada, `networkFailure` para a conexão que não abre ou cai no meio).
 - Não tem tempo de espera: quem encerra é o servidor (300 segundos no Core, 330 no Kong) ou o

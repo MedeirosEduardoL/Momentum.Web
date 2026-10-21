@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "./api-base-url";
 import { fromResponse, networkFailure } from "./api-error";
 import { REQUESTED_WITH_HEADER, session } from "./client";
 
@@ -60,9 +61,9 @@ async function* readServerSentEvents(body: ReadableStream<Uint8Array>) {
 }
 
 function send(path: string, payload: object, signal: AbortSignal) {
-  return fetch(path, {
+  return fetch(`${API_BASE_URL}${path}`, {
     method: "POST",
-    credentials: "same-origin",
+    credentials: "include",
     headers: {
       Accept: "text/event-stream",
       "Content-Type": "application/json",

@@ -3,11 +3,12 @@ id: renovacao-da-sessao
 titulo: O client renova a sessão no 401, repete a requisição e avisa o app quando ela abre ou encerra
 status: ativo
 criado: 2026-10-12
-atualizado: 2026-10-13
+atualizado: 2026-10-21
 touches:
   - src/shared/api/session.ts
   - src/shared/api/client.ts
   - src/shared/api/event-stream.ts
+  - src/shared/api/api-base-url.ts
   - src/app/providers/session-cache.ts
 simbolos:
   - createSession
@@ -23,6 +24,8 @@ simbolos:
   - retriedAfterSessionRenewal
   - SessionEndReason
   - sessionExpiryQuery
+  - API_BASE_URL
+  - VITE_API_BASE_URL
 relacionados: [guard-de-rota, token-de-link]
 ---
 
@@ -54,6 +57,10 @@ relacionados: [guard-de-rota, token-de-link]
   interceptors dele. Sem renovar ali, quem passa dos 60 minutos respondendo a uma rodada receberia
   401 ao enviar. A renovação é a mesma do interceptor, `session.renewAfter`, para as duas vias
   dividirem a chamada e a regra do que fazer quando ela é recusada.
+- Em produção, o front fica no Cloudflare Pages (`momentum.infinitemonkey.com.br`) e a API em
+  outra origem do mesmo site (`gateway.infinitemonkey.com.br`, ADR 0005 do Core): o stream precisa
+  mandar o cookie com `credentials: "include"`, como o Axios faz com `withCredentials`. O cookie é
+  só do host da API, então o navegador não o manda a nenhum outro.
 - "A sessão expirou" fica no cache do TanStack Query, ao lado da conta atual, e não numa store: a
   sessão tem uma fonte só (`.claude/rules/state.md`), e o guard precisa reagir à marca junto com a
   mudança da conta. Ela só vale com uma conta no cache: o visitante que abre o site sem sessão
@@ -91,7 +98,9 @@ relacionados: [guard-de-rota, token-de-link]
 - INV-15: O 401 de um `postEventStream` renova pela mesma `session.renewAfter` do interceptor e
   repete o pedido uma vez; o pedido repetido que volta 401 sobe como erro, sem renovar de novo.
 - INV-16: `postEventStream` manda o mesmo `X-Requested-With` do `api` (`REQUESTED_WITH_HEADER`) e
-  o cookie de sessão só para a mesma origem (`credentials: "same-origin"`).
+  o cookie de sessão com `credentials: "include"`, ao mesmo endereço do `api`: `API_BASE_URL`,
+  vindo de `VITE_API_BASE_URL` no build, e a mesma origem quando ela não existe. Reescrito em
+  2026-10-21, com a confirmação do usuário; antes, `credentials: "same-origin"`.
 
 ## LIMITACOES
 
@@ -127,5 +136,6 @@ relacionados: [guard-de-rota, token-de-link]
   devolve `src/shared/api/session.ts`.
 - `rg -n "renewAfter" src --glob '!**/*.test.*'` só devolve `src/shared/api/session.ts` e
   `src/shared/api/event-stream.ts` (INV-15).
-- `rg -n "\bfetch\(" src --glob '!**/*.test.*'` só devolve `src/shared/api/event-stream.ts`
-  (INV-16).
+- `rg -n "\bfetch\(" src --glob '!**/*.test.*'` só devolve `src/shared/api/event-stream.ts`, e
+  `rg -n "API_BASE_URL" src --glob '!**/*.test.*'` devolve `api-base-url.ts`, `client.ts` e
+  `event-stream.ts` (INV-16).
