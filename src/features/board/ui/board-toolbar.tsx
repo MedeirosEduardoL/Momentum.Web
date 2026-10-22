@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { toAssigneeOptions } from "@/features/card";
 import { useListProjectMembers } from "@/features/project";
+import { Badge } from "@/shared/ui/badge";
 import { SelectField } from "@/shared/ui/select-field";
 import {
   ANY_ASSIGNEE_OPTION,
@@ -50,7 +51,10 @@ export function BoardToolbar({ boards, board, view, onViewChange, actions }: Boa
           onViewChange({ ...view, isGroupedByAssignee: grouping === "assignee" })
         }
       />
-      <div className="ml-auto flex items-center gap-1">{actions}</div>
+      <div className="ml-auto flex items-center gap-2">
+        {board.visibility === "members" && <Badge>Acesso restrito</Badge>}
+        {actions}
+      </div>
     </div>
   );
 }

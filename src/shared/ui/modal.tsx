@@ -3,7 +3,7 @@ import { X } from "lucide-react";
 import type { ReactNode } from "react";
 import { cn } from "@/shared/lib/cn";
 
-type ModalSize = "md" | "lg";
+type ModalSize = "md" | "lg" | "xl";
 
 type ModalProps = {
   open: boolean;
@@ -11,6 +11,9 @@ type ModalProps = {
   onOpenChange: (open: boolean) => void;
   title: string;
   description?: string;
+  eyebrow?: ReactNode;
+  meta?: ReactNode;
+  headerActions?: ReactNode;
   footer?: ReactNode;
   children?: ReactNode;
 };
@@ -18,6 +21,7 @@ type ModalProps = {
 const SIZE_CLASSES: Record<ModalSize, string> = {
   md: "max-w-lg",
   lg: "max-w-3xl",
+  xl: "max-w-6xl self-start",
 };
 
 export function Modal({
@@ -26,6 +30,9 @@ export function Modal({
   onOpenChange,
   title,
   description,
+  eyebrow,
+  meta,
+  headerActions,
   footer,
   children,
 }: ModalProps) {
@@ -43,18 +50,23 @@ export function Modal({
             )}
           >
             <header className="flex items-start justify-between gap-4">
-              <div className="flex flex-col gap-1">
-                <Dialog.Title className="text-lg font-semibold">{title}</Dialog.Title>
+              <div className="flex min-w-0 flex-col gap-1">
+                {eyebrow}
+                <Dialog.Title className="text-lg font-semibold break-words">{title}</Dialog.Title>
                 {description && (
                   <Dialog.Description className="text-ink-muted">{description}</Dialog.Description>
                 )}
+                {meta}
               </div>
-              <Dialog.Close
-                aria-label="Fechar"
-                className="rounded-md p-1 text-ink-subtle transition-colors duration-150 ease-out hover:bg-surface-raised hover:text-ink"
-              >
-                <X aria-hidden className="size-4" />
-              </Dialog.Close>
+              <div className="flex shrink-0 items-center gap-1">
+                {headerActions}
+                <Dialog.Close
+                  aria-label="Fechar"
+                  className="rounded-md p-1 text-ink-subtle transition-colors duration-150 ease-out hover:bg-surface-raised hover:text-ink"
+                >
+                  <X aria-hidden className="size-4" />
+                </Dialog.Close>
+              </div>
             </header>
             {children}
             {footer && <footer className="flex justify-end gap-2">{footer}</footer>}

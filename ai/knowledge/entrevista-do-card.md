@@ -3,7 +3,7 @@ id: entrevista-do-card
 titulo: O painel da entrevista mostra o texto da IA só sanitizado, esconde o texto do stream e não pede nem aplica nada sem um clique
 status: ativo
 criado: 2026-10-13
-atualizado: 2026-10-19
+atualizado: 2026-10-22
 touches:
   - src/features/card-interview/api/card-interview.service.ts
   - src/features/card-interview/api/card-interview-proposal.service.ts
@@ -129,6 +129,9 @@ relacionados: [telas-de-card, renovacao-da-sessao, administracao-da-organizacao]
 
 ## LIMITACOES
 
+- Na modal do card e na página, a entrevista é a guia "Entrevista com IA", que fica montada depois
+  de visitada (`Tabs` de `shared/ui`): trocar de guia não aborta a rodada, mas fechar a modal ou
+  trocar de card desmonta o painel e aborta (INV-7).
 - A espera da rodada não mostra progresso: a tela só sabe que a IA terminou no evento `round` ou
   `error`.
 - Sair só da condução, com a tela do card aberta (a entrevista encerrada por outra pessoa e

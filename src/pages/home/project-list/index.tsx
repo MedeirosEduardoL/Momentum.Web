@@ -38,17 +38,17 @@ export function ProjectListPage({ firstBoardProject, onFirstBoardFinished }: Pro
               to="/projetos/$projectId/features"
               params={{ projectId: project.id }}
               className="text-sm"
-              aria-label={`Epics e features de ${project.name}`}
+              aria-label={`Features e epics de ${project.name}`}
             >
-              Epics e features
+              Features e epics
             </TextLink>
             <TextLink
               to="/projetos/$projectId/cards"
               params={{ projectId: project.id }}
               className="text-sm"
-              aria-label={`Cards de ${project.name}`}
+              aria-label={`Lista de cards de ${project.name}`}
             >
-              Cards
+              Lista de cards
             </TextLink>
           </>
         )}

@@ -16,6 +16,7 @@ const options: BoardFilterOptions = { team: [], features: [], epics: [] };
 const createdBoard: Board = {
   id: "board-9",
   projectId: "project-1",
+  visibility: "team",
   name: "Todos os cards",
   filter: NO_FILTER,
 };

@@ -22,12 +22,27 @@ no `DESIGN.md`; o inventário, em `.claude/rules/shared-ui.md`. Aqui fica o que 
   `transparent`.
 - Opacidade sobre token (`bg-canvas/75`, `hover:bg-danger/90`) é permitida e não conta como valor
   arbitrário.
+- A paleta é a do Megabrain desde 2026-10-22 (passo 11.3): neutros quentes e o coral no matiz 28.
+  O botão primário usa `action` (neutro escuro), não o `accent`, e `accent-hover` e `accent-ink`
+  saíram junto com o preenchimento coral. Os contrastes do `DESIGN.md` saem de converter OKLCH
+  para sRGB e calcular a razão WCAG contra `canvas`, `canvas-deep`, `well`, `surface` e
+  `surface-raised`; mudou um token, recalcule a tabela.
 
 ## Componentes
 
 - `Modal`: o `Content` do Radix fica dentro do `Overlay`, que é a grade que centraliza e rola.
   Assim não há valor arbitrário de altura, e o clique fora fecha. Sem `description`, o componente
-  passa `aria-describedby={undefined}` para o Radix não avisar no console.
+  passa `aria-describedby={undefined}` para o Radix não avisar no console. O `xl` (card aberto)
+  fica preso ao topo (`self-start`): centralizado, ele pulava a cada troca de guia, porque cada
+  guia tem uma altura.
+- `ActionMenu` dentro de um diálogo fica no lugar (posição absoluta); fora dele, vai num portal
+  para o `body`, em posição fixa calculada do botão, porque a coluna do board e o cartão cortam o
+  que transborda (`overflow`). Em portal, o menu fecha ao rolar ou redimensionar, em vez de
+  seguir o botão. Dentro do diálogo não pode ir ao `body`: a armadilha de foco do Radix o tornaria
+  inalcançável. O Esc do menu para a propagação, para não fechar a modal em volta.
+- `Tabs` mantém montada a guia já visitada (`hidden`): a entrevista e o briefing correm stream e
+  pedido demorado, e desmontar ao trocar de guia os cancelaria. A guia ainda não visitada não
+  monta, para a modal não pedir anexos, entrevista e briefing de uma vez ao abrir.
 - `Toaster`: o Sonner não usa classes do Tailwind; as cores entram pelas variáveis dele
   (`--normal-bg`, `--normal-text`, `--normal-border`) no `style` do toaster, e a sombra pelo
   `toastOptions.style`. O `theme` vem do `App`, que lê a store de preferências: o Sonner tem

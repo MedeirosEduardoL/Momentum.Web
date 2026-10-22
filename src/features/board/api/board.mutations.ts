@@ -1,6 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { boardKeys } from "./board-api-keys";
-import { createBoard, deleteBoard, updateBoard } from "./board.service";
+import type { BoardVisibility } from "../model/types/board.types";
+import {
+  addBoardMember,
+  createBoard,
+  deleteBoard,
+  removeBoardMember,
+  setBoardVisibility,
+  updateBoard,
+} from "./board.service";
 
 function useBoardRefresh() {
   const queryClient = useQueryClient();
@@ -38,6 +46,36 @@ export function useDeleteBoardMutation() {
   return useMutation({
     mutationFn: deleteBoard,
     onSuccess: refreshBoardLists,
+    onError: refreshEverything,
+  });
+}
+
+export function useSetBoardVisibilityMutation(boardId: string) {
+  const { refreshBoards, refreshEverything } = useBoardRefresh();
+
+  return useMutation({
+    mutationFn: (visibility: BoardVisibility) => setBoardVisibility(boardId, visibility),
+    onSuccess: refreshBoards,
+    onError: refreshEverything,
+  });
+}
+
+export function useAddBoardMemberMutation() {
+  const { refreshBoards, refreshEverything } = useBoardRefresh();
+
+  return useMutation({
+    mutationFn: addBoardMember,
+    onSuccess: refreshBoards,
+    onError: refreshEverything,
+  });
+}
+
+export function useRemoveBoardMemberMutation() {
+  const { refreshBoards, refreshEverything } = useBoardRefresh();
+
+  return useMutation({
+    mutationFn: removeBoardMember,
+    onSuccess: refreshBoards,
     onError: refreshEverything,
   });
 }

@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { Modal } from "@/shared/ui/modal";
+import { Section } from "@/shared/ui/section";
 import type { SelectOption } from "@/shared/ui/select-field";
+import { useCardExtensions } from "../model/contexts/card-extensions-context";
 import { CARD_TASK_KIND_LABELS } from "../model/lib/card-options";
 import type { CardSummary, CardTask, CardTaskState } from "../model/types/card.types";
 import { CardTaskDetailsForm } from "./card-task-details-form";
 import { CardTaskOverview } from "./card-task-overview";
 
 type CardTaskDialogProps = {
-  card: Pick<CardSummary, "identifier">;
+  card: Pick<CardSummary, "identifier" | "projectId">;
   task: CardTask;
   assigneeOptions: SelectOption[];
   selected: { state: CardTaskState; assigneeId: string };
@@ -19,6 +21,7 @@ type CardTaskDialogProps = {
 
 export function CardTaskDialog({ card, task, onClose, ...overview }: CardTaskDialogProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const { renderSubitemAttachments } = useCardExtensions();
 
   return (
     <Modal
@@ -32,6 +35,9 @@ export function CardTaskDialog({ card, task, onClose, ...overview }: CardTaskDia
         <CardTaskDetailsForm task={task} onDone={() => setIsEditing(false)} />
       ) : (
         <CardTaskOverview task={task} onEdit={() => setIsEditing(true)} {...overview} />
+      )}
+      {!isEditing && renderSubitemAttachments && (
+        <Section title="Anexos">{renderSubitemAttachments(task, card.projectId)}</Section>
       )}
     </Modal>
   );

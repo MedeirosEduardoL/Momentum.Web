@@ -1,5 +1,5 @@
 import { Plus } from "lucide-react";
-import { ProjectHierarchy } from "@/features/feature";
+import { ProjectHierarchy, type GroupsView } from "@/features/feature";
 import { ButtonLink } from "@/shared/ui/button-link";
 import {
   renderEpicLink,
@@ -10,12 +10,16 @@ import {
 
 type ProjectHierarchyPageProps = {
   projectId: string;
+  view: GroupsView;
+  onViewChange: (view: GroupsView) => void;
 };
 
-export function ProjectHierarchyPage({ projectId }: ProjectHierarchyPageProps) {
+export function ProjectHierarchyPage({ projectId, view, onViewChange }: ProjectHierarchyPageProps) {
   return (
     <ProjectHierarchy
       projectId={projectId}
+      view={view}
+      onViewChange={onViewChange}
       newEpicLink={
         <ButtonLink to="/projetos/$projectId/epics/novo" params={{ projectId }} size="sm">
           <Plus aria-hidden />

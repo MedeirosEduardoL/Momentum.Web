@@ -1,11 +1,12 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createQueryWrapper } from "@/test/query-wrapper";
 import { listEpics } from "../api/epic.service";
 import { listFeatures } from "../api/feature.service";
 import type { EpicSummary, FeatureSummary } from "../model/types/feature.types";
-import { ProjectHierarchy } from "./project-hierarchy";
+import { ProjectHierarchy, type GroupsView } from "./project-hierarchy";
 
 vi.mock("../api/feature.service");
 vi.mock("../api/epic.service");
@@ -37,10 +38,14 @@ const feature: FeatureSummary = {
   cardCount: 3,
 };
 
-function renderHierarchy() {
+const onViewChange = vi.fn<(view: GroupsView) => void>();
+
+function renderHierarchy(view: GroupsView = "hierarquia") {
   render(
     <ProjectHierarchy
       projectId="project-1"
+      view={view}
+      onViewChange={onViewChange}
       newEpicLink={<a href="/projetos/project-1/epics/novo">Novo epic</a>}
       newFeatureWithoutEpicLink={<a href="/projetos/project-1/features/nova">Nova feature</a>}
       renderEpicLink={shown => <a href={`/epics/${shown.id}`}>{shown.title}</a>}
@@ -52,11 +57,14 @@ function renderHierarchy() {
     />,
     { wrapper: createQueryWrapper().wrapper }
   );
+
+  return userEvent.setup();
 }
 
 beforeEach(() => {
   vi.mocked(listEpics).mockReset().mockResolvedValue([epic]);
   vi.mocked(listFeatures).mockReset().mockResolvedValue([feature]);
+  onViewChange.mockClear();
 });
 
 describe("ProjectHierarchy", () => {
@@ -70,11 +78,42 @@ describe("ProjectHierarchy", () => {
     expect(
       await screen.findByRole("link", { name: "Nova feature em Lista de cards" })
     ).toHaveAttribute("href", "/epics/epic-1/features/nova");
-    expect(screen.getByRole("link", { name: "Nova feature" })).toHaveAttribute(
+    expect(screen.getAllByRole("link", { name: "Nova feature" })[0]).toHaveAttribute(
       "href",
       "/projetos/project-1/features/nova"
     );
     expect(screen.queryByRole("button", { name: /Nov[ao]/ })).toBeNull();
     expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  it("mostra as features num board, na coluna do estado derivado, com o epic e o progresso", async () => {
+    renderHierarchy("features");
+
+    const board = within(await screen.findByRole("group", { name: "Board de features" }));
+    const inProgress = within(board.getByRole("region", { name: "Em andamento" }));
+    expect(inProgress.getByRole("link", { name: "Filtros da lista" })).toHaveAttribute(
+      "href",
+      "/features/feature-1"
+    );
+    expect(inProgress.getByText("Lista de cards · 3 cards")).toBeVisible();
+    expect(
+      inProgress.getByRole("progressbar", { name: "Progresso de Filtros da lista" })
+    ).toHaveAttribute("aria-valuenow", "40");
+    expect(
+      within(board.getByRole("region", { name: "A fazer" })).getByText("Nenhuma feature aqui.")
+    ).toBeVisible();
+  });
+
+  it("mostra os epics num board e troca de visão pelas abas", async () => {
+    const user = renderHierarchy("epics");
+
+    const board = within(await screen.findByRole("group", { name: "Board de epics" }));
+    expect(board.getByRole("link", { name: "Lista de cards" })).toHaveAttribute(
+      "href",
+      "/epics/epic-1"
+    );
+    await user.click(screen.getByRole("tab", { name: "Hierarquia" }));
+
+    expect(onViewChange).toHaveBeenCalledWith("hierarquia");
   });
 });

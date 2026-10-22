@@ -1,7 +1,8 @@
 # Features e epics
 
-A hierarquia de um projeto (epics, features de cada um e features sem epic), as telas de uma
-feature e de um epic e as de criar e de editar cada um. O contrato da API está em
+O board de features, o de epics e a hierarquia de um projeto (epics, features de cada um e
+features sem epic), as telas de uma feature e de um epic, com os anexos, e as de criar e de editar
+cada um. O contrato da API está em
 `../Momentum.Core/ai/memory/incremental/cards.md`, seção "Tasks, relações, features e epics"; o
 que não pode quebrar, no conhecimento `telas-de-feature-e-epic`. A feature do card e o filtro da lista por feature estão em `cards.md`.
 Aqui fica o que o código não conta.
@@ -10,7 +11,7 @@ Aqui fica o que o código não conta.
 
 | Rota | Tela | Por que este caminho |
 | --- | --- | --- |
-| `/projetos/$projectId/features` | Hierarquia do projeto: epics e features | É irmã de `/projetos/$projectId/cards`: a hierarquia é de um projeto. O nome é o da feature, que é quem agrupa cards; o epic aparece na mesma tela. |
+| `/projetos/$projectId/features` | Features e epics do projeto, em três guias (`?visao=`): board de features (padrão), board de epics (`epics`) e hierarquia (`hierarquia`) | É irmã de `/projetos/$projectId/cards`: a tela é de um projeto. O nome é o da feature, que é quem agrupa cards; o epic aparece na mesma tela. |
 | `/features/$featureId` | Feature | A feature se acha pelo id, como em `GET /api/v1/features/{featureId}`; o card aponta para cá sem saber o projeto. |
 | `/epics/$epicId` | Epic | O mesmo, para `GET /api/v1/epics/{epicId}`. |
 | `/projetos/$projectId/epics/novo` | Criar epic | O epic nasce num projeto, como o card em `/projetos/$projectId/cards/novo`. Não existe `/projetos/$projectId/epics`: a lista é a hierarquia. |
@@ -19,7 +20,7 @@ Aqui fica o que o código não conta.
 | `/features/$featureId/editar` | Editar feature | Segue a tela da feature, como `/cards/$cardId/editar`. |
 | `/epics/$epicId/editar` | Editar epic | O mesmo, para o epic. |
 
-- As oito ficam na área `member`. Chega-se à hierarquia pelo link "Epics e features" de cada
+- As oito ficam na área `member`. Chega-se à hierarquia pelo link "Features e epics" de cada
   projeto na página inicial e pelo item "Features e epics" da navegação lateral, e à feature e ao
   epic também pela seção "Feature" do card. A hierarquia, alcançada pela navegação, não tem link
   "Voltar"; as telas de feature, de epic e os formulários têm.
@@ -46,6 +47,11 @@ Aqui fica o que o código não conta.
 
 ## Fluxos
 
+- **Board de features e board de epics** (passo 11.8). Três colunas fixas, pelo estado derivado
+  (A fazer, Em andamento, Concluída), com a contagem e o traço no tom; cada cartão traz o tipo
+  ("Feature" ou "Epic"), o título (link para a tela do item), a barra de progresso e um resumo (o
+  epic e a quantidade de cards da feature; a quantidade de features e de cards do epic). Sem
+  arrastar: o estado é derivado dos cards. O cabeçalho tem "Nova feature" e "Novo epic".
 - **Hierarquia.** Na largura toda da área de conteúdo. Uma seção por epic, na ordem de criação, com o título (link para o epic), o
   estado derivado, o progresso e as quantidades de features e de cards; dentro dela, as features
   do epic. Por último, "Features sem epic". Cada feature mostra título (link), estado derivado,
@@ -53,8 +59,8 @@ Aqui fica o que o código não conta.
   "Excluir". "Novo epic" fica no topo; "Nova feature" fica em cada epic, e leva à tela de criar
   dentro dele, e em "Features sem epic", que leva à tela de criar sem epic.
 - **Feature.** Título, o seletor de epic (muda ao escolher, com "Sem epic"), o resumo, o link para
-  os cards e a descrição. "Editar" leva à tela de editar título e descrição.
-- **Epic.** Título, o resumo, a descrição e as features dele, com "Nova feature" (que leva à tela
+  os cards, a descrição e os anexos. "Editar" leva à tela de editar título e descrição.
+- **Epic.** Título, o resumo, a descrição, os anexos e as features dele, com "Nova feature" (que leva à tela
   de criar dentro do epic) e "Excluir" em cada feature. "Editar" leva à tela de editar título e
   descrição.
 - **Criar.** Título e descrição (markdown), com uma frase sobre o que é um epic ou uma feature e

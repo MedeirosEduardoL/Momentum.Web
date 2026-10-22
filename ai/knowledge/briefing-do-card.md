@@ -3,7 +3,7 @@ id: briefing-do-card
 titulo: O briefing do card só aparece sanitizado, sai como veio do Core e só é pedido com um clique
 status: ativo
 criado: 2026-10-17
-atualizado: 2026-10-20
+atualizado: 2026-10-22
 touches:
   - src/features/card-brief/**
   - src/shared/lib/copy-text.ts
@@ -61,6 +61,9 @@ relacionados: [entrevista-do-card, telas-de-card, administracao-da-organizacao]
 
 ## LIMITACOES
 
+- Na modal do card e na página, o briefing é a guia "Briefing", que fica montada depois de
+  visitada (`Tabs` de `shared/ui`): trocar de guia não perde o pedido em andamento, mas fechar a
+  modal desmonta a seção, e o briefing gerado só aparece ao abrir o card de novo.
 - Quem só lê vê o briefing novo ao recarregar a tela.
 - A permissão é a do cache da organização: quem a perde continua vendo "Gerar" até a próxima
   consulta ou até o Core recusar o pedido, e quem a ganha só vê o botão depois da próxima

@@ -14,8 +14,20 @@ describe("opções do board", () => {
   it("oferece os boards do projeto pelo nome, na ordem recebida", () => {
     expect(
       toBoardOptions([
-        { id: "board-1", projectId: "project-1", name: "Todos os cards", filter: NO_FILTER },
-        { id: "board-2", projectId: "project-1", name: "Issues", filter: NO_FILTER },
+        {
+          id: "board-1",
+          projectId: "project-1",
+          visibility: "team",
+          name: "Todos os cards",
+          filter: NO_FILTER,
+        },
+        {
+          id: "board-2",
+          projectId: "project-1",
+          visibility: "team",
+          name: "Issues",
+          filter: NO_FILTER,
+        },
       ])
     ).toEqual([
       { value: "board-1", label: "Todos os cards" },

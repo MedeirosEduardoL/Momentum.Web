@@ -41,6 +41,7 @@ function renderFeatureDetail() {
       editLink={<a href="/features/feature-1/editar">Editar</a>}
       renderBackLink={projectId => <a href={`/projetos/${projectId}/features`}>Voltar</a>}
       renderCardsLink={shown => <a href={`/cards?feature=${shown.id}`}>Cards</a>}
+      renderAttachments={shown => <p>Anexos de {shown.title}</p>}
     />,
     { wrapper: createQueryWrapper().wrapper }
   );

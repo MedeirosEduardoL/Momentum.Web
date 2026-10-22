@@ -15,9 +15,23 @@ export type BoardDefinition = {
   filter: BoardFilter;
 };
 
+export type BoardVisibility = "team" | "members";
+
 export type Board = BoardDefinition & {
   id: string;
   projectId: string;
+  visibility: BoardVisibility;
+};
+
+export type BoardMember = {
+  userId: string;
+  name: string;
+  addedAt: string;
+};
+
+export type BoardMemberChange = {
+  boardId: string;
+  userId: string;
 };
 
 export type NewBoard = BoardDefinition & {

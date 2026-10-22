@@ -37,6 +37,7 @@ const options: BoardFilterOptions = {
 const board: Board = {
   id: "board-1",
   projectId: "project-1",
+  visibility: "team",
   name: "Issues urgentes",
   filter: {
     cardTypes: ["issue"],

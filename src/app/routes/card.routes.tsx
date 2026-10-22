@@ -42,6 +42,14 @@ function CardListRoute() {
           search: fromCardListFilters(filters),
         })
       }
+      openCardId={search.card}
+      onOpenCardChange={cardId =>
+        navigate({
+          to: "/projetos/$projectId/cards",
+          params: { projectId },
+          search: previous => ({ ...previous, card: cardId }),
+        })
+      }
     />
   );
 }

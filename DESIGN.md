@@ -1,21 +1,24 @@
 # Design
 
-Direção visual do Momentum.Web: a identidade do Megabrain.Web sobre a estrutura do Azure DevOps,
-decidida pelo usuário em 2026-10-19 e no lugar da direção de 2026-10-03 (pergunta 6 do roadmap do
-produto, `../Momentum.Core/ai/roadmap.md`), que seguia o Linear. Os tokens moram em `@theme static`
-de `src/index.css`; os componentes de base, em `src/shared/ui`, com o inventário em
-`.claude/rules/shared-ui.md`.
+Direção visual do Momentum.Web, decidida pelo usuário para o beta em 2026-10-22 (D-07 e ADR 0008
+do Core, `../Momentum.Core/docs/adr/0008-board-como-tela-principal-e-card-em-modal.md`): o
+acabamento do Linear e do YouTrack, o design system e a paleta do Megabrain e o comportamento do
+Azure DevOps (VSTS). Substitui a de 2026-10-19 (identidade do Megabrain.Web em índigo sobre a
+estrutura do Azure DevOps), que por sua vez substituiu a de 2026-10-03 (pergunta 6 do roadmap).
+Os tokens moram em `@theme static` de `src/index.css`; os componentes de base, em `src/shared/ui`,
+com o inventário em `.claude/rules/shared-ui.md`.
 
 ## Identidade
 
 - **Ícone:** lua crescente — `Moon` do lucide-react na interface e `public/favicon.svg` no
   navegador.
 - **Versão de lançamento:** v1.0.0, "Las Noches".
-- **Lane:** a pele do Megabrain — índigo, superfícies de vidro, brilho discreto no fundo escuro —
-  sobre o esqueleto do Azure DevOps: barra superior com o caminho organização › projeto, navegação
-  lateral pelos hubs do projeto, lista de cards em tabela, detalhe com as propriedades num painel à
-  direita e board com colunas rebaixadas e a cor do tipo na borda do card. Denso como uma
-  ferramenta de trabalho: o card é o destaque, a interface recua.
+- **Lane:** a paleta do Megabrain — coral no matiz 28 sobre neutros quentes, superfícies de vidro,
+  brilho coral discreto no fundo escuro — com o acabamento enxuto do Linear e do YouTrack (ação
+  principal neutra e escura, coral só para seleção e foco, pouca borda), sobre o comportamento do
+  Azure DevOps: o board como tela principal, o card aberto numa modal com guias, menu de três
+  pontos no cartão e no board, a cor do tipo na borda do card. Denso como uma ferramenta de
+  trabalho: o card é o destaque, a interface recua.
 
 ## Estrutura
 
@@ -23,7 +26,7 @@ de `src/index.css`; os componentes de base, em `src/shared/ui`, com o inventári
   organização › projeto, o tema, a pessoa e "Sair". No celular, com projeto no caminho, a
   organização sai do caminho.
 - **Navegação lateral** (`app/layouts/side-nav.tsx`), presa à borda: Projetos; o projeto atual com
-  Boards, Cards e Features e epics; no pé, Configurações do projeto e Organização. Recolhida, mostra
+  Boards, Features e epics e Lista de cards, nessa ordem, porque o board é a tela principal; no pé, Configurações do projeto e Organização. Recolhida, mostra
   só os ícones; abaixo de `lg`, fica sempre recolhida. O projeto atual vem da rota ou, nas telas de
   card, feature e epic, do que a tela informa (`ValueReporter`). Os ícones e a chave do projeto
   ficam numa coluna de 32 px centrada em 24 px da borda, a mesma do botão de recolher da barra
@@ -39,22 +42,37 @@ de `src/index.css`; os componentes de base, em `src/shared/ui`, com o inventári
 - **Barra de ferramentas e filtros:** uma linha que quebra, com o rótulo ao lado do seletor
   (`SelectField` com `isLabelInline`) e as ações à direita, de ícone e fantasma, sobre uma
   divisória.
-- **Abas** de seção (pivôs do Azure DevOps) pelo `TabLink`: sublinhado no accent, sem fundo.
+- **Abas** de seção (pivôs do Azure DevOps): `TabLink` quando cada aba é uma rota, `Tabs` quando são
+  guias dentro de uma tela (o card aberto, a tela de features e epics); sublinhado no accent, sem
+  fundo, e a contagem numa pílula discreta. As guias visitadas ficam montadas, só escondidas.
 - **Lista** de muitos itens com colunas é tabela dentro de `panel`, com rolagem horizontal própria;
   coluna secundária some abaixo de `xl`. A linha inteira é clicável: o link do título se estica
   sobre ela (`after:absolute after:inset-0`, a linha `relative`), e continua sendo o único link da
   linha para o leitor de tela.
-- **Detalhe** de item com propriedades: conteúdo à esquerda, propriedades num painel à direita,
-  preso ao rolar (`lg:grid-cols-[minmax(0,1fr)_20rem]`), empilhado no celular. Embaixo do título,
-  o estado em badge, o responsável com avatar e a prioridade, quando alta ou urgente.
+- **Card aberto** (o work item do VSTS): modal larga (`Modal` `size="xl"`), presa ao topo, com o
+  identificador em cima do título, o estado, o responsável e a prioridade embaixo dele, e à
+  direita "Editar", o menu de três pontos ("Abrir em página inteira") e o X. O conteúdo vem em
+  guias: Detalhes, Relações, Anexos, Entrevista com IA e Briefing. Abre sobre o board e a lista,
+  pelo `?card=` da URL; a página própria do card mostra as mesmas guias.
+- **Detalhes** de item com propriedades: conteúdo à esquerda, propriedades num painel à direita
+  (`lg:grid-cols-[minmax(0,1fr)_20rem]`), empilhado no celular.
 - **Board:** as colunas esticam até preencher a largura (`min-w-64 flex-1`) e rolam na horizontal
   quando não cabem. O cabeçalho da coluna tem o nome, a contagem numa pílula discreta e um traço
   de 2 px em cima, no tom da categoria do estado; a coluna é uma zona rebaixada
   (`bg-well`). O cartão é vidro com a borda esquerda na cor do tipo: identificador e
   tipo, a prioridade só quando alta ou urgente, o título como link, as tasks concluídas (quando
   há) e, no rodapé, o avatar e o nome do responsável (ou "Sem responsável") e o seletor de estado
-  discreto (`SelectField` `variant="quiet"`). "Novo card" fica no topo da primeira coluna, como o
-  "New item" do Azure DevOps.
+  discreto (`SelectField` `variant="quiet"`). O topo do cartão tem o menu de três pontos, com
+  "Adicionar task", "Adicionar bug" e "Adicionar impedimento". "Novo card" fica no topo da primeira
+  coluna, como o "New item" do Azure DevOps; o menu de três pontos da barra do board leva a editar
+  o board, editar as colunas, o acesso ao board e excluir, e o selo "Acesso restrito" aparece ao
+  lado dele quando o board é só das pessoas escolhidas.
+- **Board de features e de epics:** o mesmo desenho de colunas (`BoardColumn`), uma por estado
+  derivado (a fazer, em andamento, concluída), com cartões de vidro que trazem o título, a barra de
+  progresso e a contagem de cards; sem arrastar, porque o estado é derivado.
+- **Anexos:** zona de soltar com o botão "Escolher arquivos" (`FileDropZone`), barra de progresso
+  durante o envio e a lista com nome, tamanho, quem enviou e as ações Visualizar (só imagem),
+  Baixar e Excluir.
 
 ## Tema
 
@@ -71,48 +89,52 @@ clara. Uma CSP futura precisa do hash desse script.
 ## Cor
 
 Tokens em OKLCH, com a paleta padrão do Tailwind removida (`--color-*: initial`): `bg-zinc-900`
-não existe. Neutros frios, puxados para o índigo (matiz 275).
+não existe. Neutros quentes, puxados para o coral do Megabrain (matiz 28).
 
 | Token | Claro | Escuro | Papel |
 | --- | --- | --- | --- |
-| `canvas` | `oklch(0.965 0.004 275)` | `oklch(0.16 0.008 275)` | Fundo da aplicação |
-| `canvas-deep` | `oklch(0.94 0.006 275)` | `oklch(0.13 0.008 275)` | Fim do degradê do fundo |
-| `well` | `oklch(0.935 0.006 275)` | `oklch(0.185 0.009 275)` | Zona rebaixada (coluna do board): mais escura que o fundo no claro, mais clara no escuro |
-| `surface` | `oklch(0.99 0.002 275)` | `oklch(0.19 0.009 275)` | Superfície opaca |
-| `surface-raised` | `oklch(0.935 0.006 275)` | `oklch(0.23 0.01 275)` | Hover, item ativo, badge neutro |
-| `line` | `oklch(0.88 0.008 275)` | `oklch(0.28 0.01 275)` | Divisória |
-| `line-strong` | `oklch(0.6 0.012 275)` | `oklch(0.53 0.012 275)` | Borda de campo e de controle |
-| `ink` | `oklch(0.22 0.012 275)` | `oklch(0.95 0.005 275)` | Texto principal |
-| `ink-muted` | `oklch(0.42 0.014 275)` | `oklch(0.77 0.01 275)` | Texto secundário |
-| `ink-subtle` | `oklch(0.5 0.014 275)` | `oklch(0.63 0.012 275)` | Metadado, placeholder |
-| `accent` | `oklch(0.5 0.16 282)` | `oklch(0.52 0.15 282)` | Preenchimento da ação primária |
-| `accent-hover` | `oklch(0.45 0.16 282)` | `oklch(0.56 0.15 282)` | Hover da ação primária |
-| `accent-ink` | `oklch(0.99 0.003 282)` | igual | Texto sobre `accent` |
-| `accent-text` | `oklch(0.48 0.16 282)` | `oklch(0.78 0.11 285)` | Link, anel de foco, aba e ícone ativos |
-| `accent-soft` | `oklch(0.93 0.03 282)` | `oklch(0.29 0.06 282)` | Fundo de avatar, chave do projeto, badge |
+| `canvas` | `oklch(0.95 0.004 28)` | `oklch(0.105 0.005 28)` | Fundo da aplicação |
+| `canvas-deep` | `oklch(0.925 0.006 28)` | `oklch(0.075 0.004 28)` | Fim do degradê do fundo |
+| `well` | `oklch(0.915 0.008 28)` | `oklch(0.135 0.007 28)` | Zona rebaixada (coluna do board): mais escura que o fundo no claro, mais clara no escuro |
+| `surface` | `oklch(0.985 0.003 28)` | `oklch(0.155 0.008 28)` | Superfície opaca |
+| `surface-raised` | `oklch(0.915 0.008 28)` | `oklch(0.205 0.01 28)` | Hover, item ativo, opção escolhida, badge neutro |
+| `line` | `oklch(0.85 0.01 28)` | `oklch(0.25 0.01 28)` | Divisória |
+| `line-strong` | `oklch(0.6 0.012 28)` | `oklch(0.53 0.012 28)` | Borda de campo e de controle |
+| `ink` | `oklch(0.2 0.009 28)` | `oklch(0.93 0.006 28)` | Texto principal |
+| `ink-muted` | `oklch(0.4 0.01 28)` | `oklch(0.75 0.008 28)` | Texto secundário |
+| `ink-subtle` | `oklch(0.47 0.01 28)` | `oklch(0.63 0.008 28)` | Metadado, placeholder |
+| `action` | `oklch(0.28 0.012 28)` | `oklch(0.32 0.012 28)` | Preenchimento da ação primária |
+| `action-hover` | `oklch(0.34 0.014 28)` | `oklch(0.39 0.014 28)` | Hover da ação primária |
+| `action-ink` | `oklch(0.97 0.004 28)` | `oklch(0.95 0.005 28)` | Texto sobre `action` |
+| `accent` | `oklch(0.48 0.18 28)` | `oklch(0.57 0.18 28)` | Traço da aba ativa |
+| `accent-text` | `oklch(0.43 0.17 28)` | `oklch(0.76 0.14 28)` | Link, anel de foco, aba e ícone ativos, borda da opção escolhida |
+| `accent-soft` | `oklch(0.91 0.045 28)` | `oklch(0.245 0.065 28)` | Fundo de avatar, chave do projeto, badge, zona de soltar ativa |
 | `danger`, `success`, `warning`, `info` | tons 0.42–0.48 | tons 0.7–0.83 | Texto e ícone de estado |
 | `*-soft` dos quatro | tons 0.93–0.94 | tons 0.27–0.29 | Fundo de badge e de aviso |
-| `type-user-story`, `type-spike`, `type-issue`, `type-tech-debt` | tons 0.55–0.62 | tons 0.7–0.8 | Marca e borda do tipo do card |
+| `type-user-story`, `type-spike`, `type-issue`, `type-tech-debt` | tons 0.55–0.58 | tons 0.7–0.8 | Marca e borda do tipo do card |
 
-Contraste conferido (razão WCAG, pior caso contra `canvas`, `canvas-deep`, `surface` e
-`surface-raised`):
+Contraste conferido (razão WCAG, pior caso contra `canvas`, `canvas-deep`, `well`, `surface` e
+`surface-raised`), recalculado em 2026-10-22 com a paleta coral:
 
 | Par | Claro | Escuro |
 | --- | --- | --- |
-| `ink` | 14,3:1 | 14,6:1 |
-| `ink-muted` | 7,0:1 | 8,1:1 |
-| `ink-subtle` | 5,0:1 | 4,8:1 |
-| `accent-text` | 5,7:1 | 8,2:1 |
-| `danger`, `success`, `warning`, `info` | ≥ 5,9:1 | ≥ 5,9:1 |
-| `line-strong` | 3,3:1 | 3,2:1 |
-| cores de tipo (gráfico, não texto) | ≥ 3,1:1 | ≥ 5,9:1 |
-| `accent-ink` sobre `accent` / `accent-hover` | 6,2:1 / 7,7:1 | 5,6:1 / 4,7:1 |
-| texto do badge sobre o `*-soft` do tom | ≥ 5,6:1 | ≥ 5,4:1 |
+| `ink` | 14,1:1 | 14,6:1 |
+| `ink-muted` | 7,2:1 | 8,0:1 |
+| `ink-subtle` | 5,3:1 | 5,1:1 |
+| `accent-text` | 6,9:1 | 7,9:1 |
+| `accent` (traço, gráfico) | 5,6:1 | 3,7:1 |
+| `danger`, `success`, `warning`, `info` | ≥ 5,5:1 | ≥ 6,3:1 |
+| `line-strong` | 3,1:1 | 3,4:1 |
+| cores de tipo (gráfico, não texto) | ≥ 3,4:1 | ≥ 6,3:1 |
+| `action-ink` sobre `action` / `action-hover` | 13,4:1 / 10,8:1 | 11,0:1 / 8,3:1 |
+| `accent-text` sobre `accent-soft` | 6,7:1 | 7,3:1 |
+| texto do badge sobre o `*-soft` do tom | ≥ 5,8:1 | ≥ 5,4:1 |
 
 Texto fica em 4,5:1 ou mais; borda que identifica controle e marca gráfica, em 3:1 ou mais.
 
-**Um accent:** índigo — preenchimento na ação primária, texto no link, no foco, na aba e no item
-ativo da navegação. Nunca como decoração.
+**Um accent:** coral — texto no link, no foco, na aba e no item ativo da navegação, a borda da
+opção escolhida e a zona de soltar ativa. A ação primária não é coral: é o `action`, neutro e
+escuro, como no Linear, para que o coral marque só o que está selecionado. Nunca como decoração.
 
 **Cor de estado só em badge.** O estado do card e a prioridade aparecem pelo `Badge`, com o tom
 decidido em `features/card/model/lib/card-tones.ts` (a fazer neutro, em andamento info, feito
@@ -209,10 +231,11 @@ o brilho atravessar e opaco o bastante para o texto manter o contraste das super
 
 | Onde | Valor | Motivo |
 | --- | --- | --- |
-| `public/favicon.svg` | `#b0adfb` | O favicon não lê variável CSS; é o `accent-text` do escuro em hex. |
-| `index.html` (`theme-color`) | `#f2f3f6` | A meta tag não lê variável CSS; é o `canvas` do claro em hex. |
+| `public/favicon.svg` | `#fd8c7e` | O favicon não lê variável CSS; é o `accent-text` do escuro em hex. |
+| `index.html` (`theme-color`) | `#f1eded` | A meta tag não lê variável CSS; é o `canvas` do claro em hex. |
 | `card-list-results.tsx` | `min-w-[40rem]` | Largura mínima da tabela de cards antes da rolagem horizontal. |
-| `card-detail.tsx` | `20rem` na grade | Largura do painel de propriedades do card. |
+| `card-details-tab.tsx` | `20rem` na grade | Largura do painel de propriedades do card. |
+| `attachment-preview-dialog.tsx` | `max-h-[70dvh]` | A imagem pré-visualizada cabe na modal sem rolar a página. |
 | `card-type-mark.tsx`, `card-tile.tsx` | `w-[3px]`, `border-l-[3px]` | Espessura da marca do tipo, a do Azure DevOps. |
 | `screen.tsx`, `organization-settings-layout.tsx` | `tracking-[-0.01em]` | Aperto do título da tela em `text-2xl`. |
 | `side-nav.tsx` | `h-[calc(100dvh-3rem)]` | Altura da navegação lateral abaixo da barra superior de 3rem. |

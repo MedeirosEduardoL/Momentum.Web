@@ -115,6 +115,7 @@ function simulateCore({ role = "administrator", boards = [], columns = columnsDt
     "/api/v1/projects/project-1/members": membersDto,
     "/api/v1/features": featuresDto,
     "/api/v1/epics": epicsDto,
+    "/api/v1/boards/board-1/members": [],
   };
 
   vi.mocked(api.get).mockImplementation((path: string) =>
@@ -412,7 +413,7 @@ describe("ProjectBoard — board escolhido", () => {
 });
 
 describe("ProjectBoard — administração do board", () => {
-  it("guarda editar, editar colunas e excluir no menu do board", async () => {
+  it("guarda editar, editar colunas, acesso e excluir no menu do board", async () => {
     const user = renderBoard({ boards: [allCardsDto] });
 
     await user.click(await screen.findByRole("button", { name: "Ações do board Todos os cards" }));
@@ -420,9 +421,51 @@ describe("ProjectBoard — administração do board", () => {
     expect(screen.getAllByRole("menuitem").map(item => item.textContent)).toEqual([
       "Editar board",
       "Editar colunas",
+      "Acesso ao board",
       "Excluir",
     ]);
     expect(screen.queryByRole("button", { name: "Editar board" })).toBeNull();
+  });
+
+  it("mostra o selo de acesso restrito no board que só pessoas escolhidas veem", async () => {
+    renderBoard({ boards: [{ ...allCardsDto, visibility: "members" }] });
+
+    expect(await screen.findByText("Acesso restrito")).toBeVisible();
+  });
+
+  it("restringe o board às pessoas escolhidas pelo menu de acesso", async () => {
+    vi.mocked(api.patch).mockResolvedValue({ data: { ...allCardsDto, visibility: "members" } });
+    const user = renderBoard({ boards: [{ ...allCardsDto, visibility: "team" }] });
+
+    await chooseBoardAction(user, "Acesso ao board");
+    const dialog = within(
+      await screen.findByRole("dialog", { name: "Acesso ao board Todos os cards" })
+    );
+    expect(await dialog.findByText("Todo o time vê este board")).toBeVisible();
+    expect(dialog.getByText("Bruno Lima")).toBeVisible();
+    await user.click(dialog.getByRole("radio", { name: /Só as pessoas escolhidas/ }));
+
+    await waitFor(() =>
+      expect(api.patch).toHaveBeenCalledWith("/api/v1/boards/board-1", { visibility: "members" })
+    );
+  });
+
+  it("dá acesso a alguém do time num board restrito e mostra os administradores que sempre veem", async () => {
+    const user = renderBoard({ boards: [{ ...allCardsDto, visibility: "members" }] });
+
+    await chooseBoardAction(user, "Acesso ao board");
+    const dialog = within(
+      await screen.findByRole("dialog", { name: "Acesso ao board Todos os cards" })
+    );
+    const people = within(await dialog.findByRole("list", { name: "Quem vê este board" }));
+    expect(people.getByText("Ana Souza")).toBeVisible();
+    expect(people.getByText("Administrador")).toBeVisible();
+    await user.selectOptions(dialog.getByLabelText("Dar acesso a"), "user-2");
+    await user.click(dialog.getByRole("button", { name: "Dar acesso" }));
+
+    await waitFor(() =>
+      expect(api.put).toHaveBeenCalledWith("/api/v1/boards/board-1/members/user-2")
+    );
   });
 
   it("abre a edição das colunas, que são os estados do projeto", async () => {

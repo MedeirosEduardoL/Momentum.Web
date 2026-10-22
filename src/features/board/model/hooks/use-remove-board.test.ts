@@ -12,7 +12,13 @@ import { useRemoveBoard } from "./use-remove-board";
 vi.mock("../../api/board.service");
 vi.mock("sonner", () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 
-const board: Board = { id: "board-1", projectId: "project-1", name: "Issues", filter: NO_FILTER };
+const board: Board = {
+  id: "board-1",
+  projectId: "project-1",
+  visibility: "team",
+  name: "Issues",
+  filter: NO_FILTER,
+};
 const COLUMNS_KEY = boardKeys.columns({ boardId: "board-1" });
 const onRemoved = vi.fn();
 

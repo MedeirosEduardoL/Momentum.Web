@@ -270,6 +270,159 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/attachments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Lista os anexos de um card, de um subitem, de uma feature ou de um epic, do mais novo para o mais antigo. */
+        get: {
+            parameters: {
+                query?: {
+                    card_id?: string;
+                    card_task_id?: string;
+                    feature_id?: string;
+                    epic_id?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AttachmentResponseDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** @description Anexa um arquivo de até 20 MB a um card, a um subitem, a uma feature ou a um epic, guardado no servidor. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        file?: components["schemas"]["IFormFile"];
+                    } & {
+                        /** Format: uuid */
+                        card_id?: string;
+                    } & {
+                        /** Format: uuid */
+                        card_task_id?: string;
+                    } & {
+                        /** Format: uuid */
+                        feature_id?: string;
+                    } & {
+                        /** Format: uuid */
+                        epic_id?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AttachmentResponseDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attachments/{attachmentId}/content": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Baixa o conteúdo de um anexo, sempre como arquivo para salvar, nunca para abrir no navegador. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    attachmentId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/octet-stream": components["schemas"]["Stream"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attachments/{attachmentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** @description Exclui um anexo e o arquivo dele. */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    attachmentId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/boards": {
         parameters: {
             query?: never;
@@ -277,7 +430,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Lista os boards de um projeto, cada um com o filtro salvo. */
+        /** @description Lista os boards de um projeto que a pessoa pode ver, cada um com o filtro salvo e a visibilidade. */
         get: {
             parameters: {
                 query?: {
@@ -387,7 +540,7 @@ export interface paths {
         };
         options?: never;
         head?: never;
-        /** @description Altera o nome de um board ou troca o filtro dele por inteiro; só o administrador do projeto. */
+        /** @description Altera o nome de um board, troca o filtro dele por inteiro ou muda quem o vê, todo o time ou só as pessoas escolhidas; só o administrador do projeto. */
         patch: {
             parameters: {
                 query?: never;
@@ -452,6 +605,102 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/boards/{boardId}/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Lista quem foi escolhido para ver um board de acesso restrito, com o nome de cada pessoa; só o administrador do projeto. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    boardId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BoardMemberResponseDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/boards/{boardId}/members/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** @description Dá a uma pessoa do time acesso a um board de acesso restrito; só o administrador do projeto. */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    boardId: string;
+                    userId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        post?: never;
+        /** @description Tira de uma pessoa o acesso a um board de acesso restrito; só o administrador do projeto. */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    boardId: string;
+                    userId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         options?: never;
         head?: never;
         patch?: never;
@@ -2560,6 +2809,26 @@ export interface components {
         AskInterviewRoundRequestDto: {
             answers?: null | components["schemas"]["InterviewAnswerDto"][];
         };
+        AttachmentResponseDto: {
+            /** Format: uuid */
+            attachment_id: string;
+            /** Format: uuid */
+            card_id: null | string;
+            /** Format: uuid */
+            card_task_id: null | string;
+            /** Format: uuid */
+            feature_id: null | string;
+            /** Format: uuid */
+            epic_id: null | string;
+            file_name: string;
+            content_type: string;
+            /** Format: int64 */
+            size_bytes: number;
+            /** Format: uuid */
+            uploaded_by: null | string;
+            /** Format: date-time */
+            created_at: string;
+        };
         BoardColumnResponseDto: {
             state: components["schemas"]["CardStateResponseDto"];
             /** Format: int32 */
@@ -2580,6 +2849,13 @@ export interface components {
             feature_ids?: null | string[];
             epic_ids?: null | string[];
         };
+        BoardMemberResponseDto: {
+            /** Format: uuid */
+            user_id: string;
+            name: string;
+            /** Format: date-time */
+            added_at: string;
+        };
         BoardResponseDto: {
             /** Format: uuid */
             board_id: string;
@@ -2587,11 +2863,14 @@ export interface components {
             project_id: string;
             name: string;
             filter: components["schemas"]["BoardFilter"];
+            visibility: components["schemas"]["BoardVisibility"];
             /** Format: date-time */
             created_at: string;
             /** Format: date-time */
             updated_at: string;
         };
+        /** @enum {string} */
+        BoardVisibility: "team" | "members";
         CardAssigneeResponseDto: {
             /** Format: uuid */
             user_id: string;
@@ -2876,6 +3155,8 @@ export interface components {
             /** Format: date-time */
             updated_at: string;
         };
+        /** Format: binary */
+        IFormFile: string;
         InterviewAnswerDto: {
             /** Format: int32 */
             question: null | number;
@@ -3092,12 +3373,16 @@ export interface components {
             /** Format: uuid */
             card_id: null | string;
         };
+        /** Format: binary */
+        Stream: string;
         TechDebtFieldsDto: {
             impact: null | string;
         };
         UpdateBoardRequestDto: {
             name?: null | string;
             filter?: null | components["schemas"]["BoardFilterRequestDto"];
+            /** @enum {string} */
+            visibility?: "team" | "members";
         };
         UpdateCardRequestDto: {
             title?: null | string;

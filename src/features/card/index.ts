@@ -1,4 +1,6 @@
 export { CardDetail } from "./ui/card-detail";
+export { CardDialog } from "./ui/card-dialog";
+export { CardExtensionsProvider } from "./model/contexts/card-extensions-provider";
 export { CardList } from "./ui/card-list";
 export { CardStateColumns } from "./ui/card-state-columns";
 export { CardStateSettings } from "./ui/card-state-settings";
@@ -13,6 +15,7 @@ export {
   toAssigneeOptions,
   toFeatureOptions,
 } from "./model/lib/card-options";
+export type { CardExtensions } from "./model/contexts/card-extensions-context";
 export type {
   Card,
   CardListFilters,
@@ -21,4 +24,5 @@ export type {
   CardStateColumn,
   CardSummary,
   CardType,
+  RelatedCard,
 } from "./model/types/card.types";

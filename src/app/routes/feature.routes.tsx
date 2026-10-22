@@ -1,5 +1,13 @@
-import { createRoute, lazyRouteComponent, useParams, type AnyRoute } from "@tanstack/react-router";
+import {
+  createRoute,
+  lazyRouteComponent,
+  useNavigate,
+  useParams,
+  useSearch,
+  type AnyRoute,
+} from "@tanstack/react-router";
 import { useProjectContextStore } from "@/app/stores/project-context.store";
+import { fromGroupsView, toGroupsSearch, toGroupsView } from "./groups-search";
 import { withPagePreload } from "./with-page-preload";
 
 const ProjectHierarchyPage = lazyRouteComponent(() =>
@@ -36,8 +44,22 @@ const NewEpicFeaturePage = lazyRouteComponent(() =>
 
 function ProjectHierarchyRoute() {
   const { projectId } = useParams({ from: "/member/projetos/$projectId/features" });
+  const search = useSearch({ from: "/member/projetos/$projectId/features" });
+  const navigate = useNavigate();
 
-  return <ProjectHierarchyPage projectId={projectId} />;
+  return (
+    <ProjectHierarchyPage
+      projectId={projectId}
+      view={toGroupsView(search)}
+      onViewChange={view =>
+        navigate({
+          to: "/projetos/$projectId/features",
+          params: { projectId },
+          search: fromGroupsView(view),
+        })
+      }
+    />
+  );
 }
 
 function NewFeatureRoute() {
@@ -88,6 +110,7 @@ export function createFeatureRoutes<TMemberRoute extends AnyRoute>(memberRoute: 
   const projectHierarchyRoute = createRoute({
     getParentRoute: () => memberRoute,
     path: "/projetos/$projectId/features",
+    validateSearch: toGroupsSearch,
     component: withPagePreload(ProjectHierarchyRoute, ProjectHierarchyPage),
   });
 

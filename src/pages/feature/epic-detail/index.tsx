@@ -1,4 +1,5 @@
 import { Pencil } from "lucide-react";
+import { AttachmentPanel } from "@/features/attachment";
 import { EpicDetail } from "@/features/feature";
 import { ButtonLink } from "@/shared/ui/button-link";
 import {
@@ -27,6 +28,9 @@ export function EpicDetailPage({ epicId, onProjectChange }: EpicDetailPageProps)
       renderNewFeatureLink={renderNewEpicFeatureLink}
       renderFeatureLink={renderFeatureLink}
       renderCardsLink={renderFeatureCardsLink}
+      renderAttachments={epic => (
+        <AttachmentPanel target={{ kind: "epic", id: epic.id }} projectId={epic.projectId} />
+      )}
     />
   );
 }

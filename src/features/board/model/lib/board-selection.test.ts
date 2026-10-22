@@ -6,6 +6,7 @@ import { isMissingBoard, selectBoard } from "./board-selection";
 const allCards: Board = {
   id: "board-1",
   projectId: "project-1",
+  visibility: "team",
   name: "Todos os cards",
   filter: NO_FILTER,
 };

@@ -1,4 +1,4 @@
-import { Columns3, Pencil, Trash2 } from "lucide-react";
+import { Columns3, Lock, Pencil, Trash2 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { ActionMenu } from "@/shared/ui/action-menu";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
@@ -6,6 +6,7 @@ import { Modal } from "@/shared/ui/modal";
 import { useConfirmation } from "@/shared/ui/use-confirmation";
 import { useRemoveBoard } from "../model/hooks/use-remove-board";
 import type { Board, BoardColumns, BoardView } from "../model/types/board.types";
+import { BoardAccessDialog } from "./board-access-dialog";
 import { BoardColumnsContent } from "./board-columns-content";
 import { BoardFilterOptionsContent } from "./board-filter-options-content";
 import { BoardToolbar } from "./board-toolbar";
@@ -34,6 +35,7 @@ export function SelectedBoard({
 }: SelectedBoardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingColumns, setIsEditingColumns] = useState(false);
+  const [isEditingAccess, setIsEditingAccess] = useState(false);
   const removeBoard = useRemoveBoard(() => onViewChange({ ...view, boardId: undefined }));
   const removal = useConfirmation(() => {
     onRemoving(board);
@@ -61,6 +63,11 @@ export function SelectedBoard({
                   label: "Editar colunas",
                   icon: <Columns3 aria-hidden />,
                   onSelect: () => setIsEditingColumns(true),
+                },
+                {
+                  label: "Acesso ao board",
+                  icon: <Lock aria-hidden />,
+                  onSelect: () => setIsEditingAccess(true),
                 },
                 {
                   label: "Excluir",
@@ -103,6 +110,9 @@ export function SelectedBoard({
       >
         {columnsEditor}
       </Modal>
+      {isEditingAccess && (
+        <BoardAccessDialog board={board} open onOpenChange={setIsEditingAccess} />
+      )}
       <ConfirmDialog
         open={removal.isOpen}
         title={`Excluir o board ${board.name}?`}

@@ -176,3 +176,34 @@ describe("CardTile — subitens", () => {
     expect(within(dialog).getByRole("heading", { name: "O que está travando" })).toBeVisible();
   });
 });
+
+describe("CardTile — menu de três pontos", () => {
+  it("oferece adicionar task, bug e impedimento, mesmo sem nenhum subitem do tipo", async () => {
+    const user = renderTile();
+
+    await user.click(screen.getByRole("button", { name: "Ações de MOM-12" }));
+
+    expect(screen.getAllByRole("menuitem").map(item => item.textContent)).toEqual([
+      "Adicionar task",
+      "Adicionar bug",
+      "Adicionar impedimento",
+    ]);
+  });
+
+  it("abre o campo do tipo escolhido com o foco nele e cria o primeiro bug do card", async () => {
+    const user = renderTile();
+
+    await user.click(screen.getByRole("button", { name: "Ações de MOM-12" }));
+    await user.click(screen.getByRole("menuitem", { name: "Adicionar bug" }));
+    const field = await screen.findByRole("textbox", { name: "Novo bug em MOM-12" });
+    await waitFor(() => expect(field).toHaveFocus());
+    await user.type(field, "Botão some no celular{Enter}");
+
+    await waitFor(() => expect(createCardTask).toHaveBeenCalledOnce());
+    expect(vi.mocked(createCardTask).mock.calls[0][0]).toMatchObject({
+      cardId: "card-1",
+      kind: "bug",
+      title: "Botão some no celular",
+    });
+  });
+});

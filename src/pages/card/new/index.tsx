@@ -13,11 +13,17 @@ export function NewCardPage({ projectId }: NewCardPageProps) {
     <CreateCardForm
       projectId={projectId}
       backLink={
-        <TextLink to="/projetos/$projectId/cards" params={{ projectId }}>
-          Voltar para os cards do projeto
+        <TextLink to="/projetos/$projectId/boards" params={{ projectId }}>
+          Voltar para o board
         </TextLink>
       }
-      onCreated={card => navigate({ to: "/cards/$cardId", params: { cardId: card.id } })}
+      onCreated={card =>
+        navigate({
+          to: "/projetos/$projectId/boards",
+          params: { projectId },
+          search: { card: card.id },
+        })
+      }
     />
   );
 }

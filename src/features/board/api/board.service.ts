@@ -6,13 +6,17 @@ import type {
   Board,
   BoardColumnsQuery,
   BoardFilter,
+  BoardMember,
+  BoardMemberChange,
   BoardUpdate,
+  BoardVisibility,
   NewBoard,
 } from "../model/types/board.types";
 
 type Schemas = components["schemas"];
 type BoardDto = Schemas["BoardResponseDto"];
 type BoardColumnDto = Schemas["BoardColumnResponseDto"];
+type BoardMemberDto = Schemas["BoardMemberResponseDto"];
 type BoardListParams = NonNullable<paths["/api/v1/boards"]["get"]["parameters"]["query"]>;
 type BoardColumnsParams = NonNullable<
   paths["/api/v1/boards/{boardId}/columns"]["get"]["parameters"]["query"]
@@ -29,6 +33,7 @@ function toBoard(dto: BoardDto): Board {
     id: dto.board_id,
     projectId: dto.project_id,
     name: dto.name,
+    visibility: dto.visibility,
     filter: {
       cardTypes: dto.filter.card_types,
       priorities: dto.filter.priorities,
@@ -82,8 +87,42 @@ export async function updateBoard({ boardId, name, filter }: BoardUpdate): Promi
   return toBoard(response.data);
 }
 
+export async function setBoardVisibility(
+  boardId: string,
+  visibility: BoardVisibility
+): Promise<Board> {
+  const payload: Schemas["UpdateBoardRequestDto"] = { visibility };
+  const response = await api.patch<BoardDto>(boardPath(boardId), payload);
+
+  return toBoard(response.data);
+}
+
 export async function deleteBoard(boardId: string): Promise<void> {
   await api.delete(boardPath(boardId));
+}
+
+function boardMemberPath({ boardId, userId }: BoardMemberChange) {
+  return fillPath("/api/v1/boards/{boardId}/members/{userId}", { boardId, userId });
+}
+
+export async function listBoardMembers(boardId: string): Promise<BoardMember[]> {
+  const response = await api.get<BoardMemberDto[]>(
+    fillPath("/api/v1/boards/{boardId}/members", { boardId })
+  );
+
+  return response.data.map(member => ({
+    userId: member.user_id,
+    name: member.name,
+    addedAt: member.added_at,
+  }));
+}
+
+export async function addBoardMember(change: BoardMemberChange): Promise<void> {
+  await api.put(boardMemberPath(change));
+}
+
+export async function removeBoardMember(change: BoardMemberChange): Promise<void> {
+  await api.delete(boardMemberPath(change));
 }
 
 export async function listBoardColumns({

@@ -13,6 +13,7 @@ type EpicLinks = FeatureLinks & {
   editLink: ReactNode;
   renderBackLink: (projectId: string) => ReactNode;
   renderNewFeatureLink: (epic: EpicSummary) => ReactNode;
+  renderAttachments: (epic: EpicSummary) => ReactNode;
 };
 
 type EpicDetailProps = EpicLinks & {
@@ -28,6 +29,7 @@ function EpicScreen({
   editLink,
   renderBackLink,
   renderNewFeatureLink,
+  renderAttachments,
   ...featureLinks
 }: EpicScreenProps) {
   return (
@@ -42,6 +44,7 @@ function EpicScreen({
       <Section title="Features do epic" action={renderNewFeatureLink(epic)}>
         <EpicFeatures epic={epic} {...featureLinks} />
       </Section>
+      <Section title="Anexos">{renderAttachments(epic)}</Section>
     </Screen>
   );
 }

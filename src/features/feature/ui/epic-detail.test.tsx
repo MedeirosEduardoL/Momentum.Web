@@ -50,6 +50,7 @@ function renderEpicDetail() {
         <a href={`/epics/${shown.id}/features/nova`}>Nova feature em {shown.title}</a>
       )}
       renderFeatureLink={feature => <a href={`/features/${feature.id}`}>{feature.title}</a>}
+      renderAttachments={shown => <p>Anexos de {shown.title}</p>}
       renderCardsLink={feature => <a href={`/cards?feature=${feature.id}`}>Cards</a>}
     />,
     { wrapper: createQueryWrapper().wrapper }

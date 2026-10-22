@@ -32,10 +32,6 @@ export function SideNav({ projectId, isCollapsed }: SideNavProps) {
             <SquareKanban aria-hidden />
             <span>Boards</span>
           </SideNavLink>
-          <SideNavLink to="/projetos/$projectId/cards" params={{ projectId }} title="Cards">
-            <ListChecks aria-hidden />
-            <span>Cards</span>
-          </SideNavLink>
           <SideNavLink
             to="/projetos/$projectId/features"
             params={{ projectId }}
@@ -43,6 +39,14 @@ export function SideNav({ projectId, isCollapsed }: SideNavProps) {
           >
             <Layers aria-hidden />
             <span>Features e epics</span>
+          </SideNavLink>
+          <SideNavLink
+            to="/projetos/$projectId/cards"
+            params={{ projectId }}
+            title="Lista de cards"
+          >
+            <ListChecks aria-hidden />
+            <span>Lista de cards</span>
           </SideNavLink>
         </nav>
       )}

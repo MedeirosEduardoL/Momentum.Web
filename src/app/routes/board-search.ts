@@ -8,6 +8,7 @@ export type BoardSearch = {
   board?: string;
   responsavel?: string;
   agrupar?: typeof BY_ASSIGNEE;
+  card?: string;
 };
 
 export function toBoardSearch(search: Record<string, unknown>): BoardSearch {
@@ -15,6 +16,7 @@ export function toBoardSearch(search: Record<string, unknown>): BoardSearch {
     board: readId(search.board),
     responsavel: readAssigneeSearch(search.responsavel),
     agrupar: search.agrupar === BY_ASSIGNEE ? BY_ASSIGNEE : undefined,
+    card: readId(search.card),
   };
 }
 

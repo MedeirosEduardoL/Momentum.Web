@@ -12,12 +12,14 @@ os formulários de criar e editar, com os campos de cada tipo. O contrato da API
 | --- | --- | --- |
 | `/projetos/$projectId/cards` | Lista de cards do projeto | A lista é de um projeto: sem ele não há o que listar. |
 | `/projetos/$projectId/cards/novo` | Formulário de criar | O card nasce num projeto e não sai dele. |
-| `/cards/$cardId` | Detalhe | O card se acha pelo id, como em `GET /api/v1/cards/{cardId}`. Uma relação entre cards de projetos diferentes aponta para cá sem saber o projeto. |
+| `/cards/$cardId` | Detalhe em página inteira | O card se acha pelo id, como em `GET /api/v1/cards/{cardId}`. Uma relação entre cards de projetos diferentes aponta para cá sem saber o projeto. Desde 2026-10-22 é o "Abrir em página inteira" da modal. |
+| `?card=<id>` no board e na lista | Card aberto em modal | O jeito principal de abrir um card (passo 11.6, ADR 0008 do Core): a modal fica sobre a tela, e o endereço com o card aberto se recarrega e se compartilha. |
 | `/cards/$cardId/editar` | Formulário de editar | Segue o detalhe. |
 
-- As quatro ficam na área `member`. Chega-se à lista pelo link "Cards" de cada projeto na página
-  inicial e pelo item "Cards" da navegação lateral; por isso a lista não tem link "Voltar", e o
-  detalhe e os formulários têm.
+- As quatro ficam na área `member`. Chega-se à lista pelo link "Lista de cards" de cada projeto na
+  página inicial e pelo item "Lista de cards" da navegação lateral, o último, porque o board é a
+  tela principal; por isso a lista não tem link "Voltar", e o detalhe e os formulários têm ("Voltar
+  para o board").
 - Os filtros da lista são parâmetros da URL, em português: `tipo`, `estado`, `responsavel`,
   `feature`, `arquivados` e `pagina`. Os valores são os do contrato (`tipo=user_story`, o id do
   estado, o id da pessoa, o id da feature), sem tabela de tradução. O padrão não vai para a URL:
@@ -80,11 +82,22 @@ os formulários de criar e editar, com os campos de cada tipo. O contrato da API
   categoria concluído abre "Concluir MOM-12?", que diz quantas tasks serão concluídas, e só o
   "Concluir" grava; "Voltar" deixa o seletor no estado de antes. O board usa a mesma confirmação
   (`useCompletionConfirmation` e `CardCompletionDialog`). Arquivar pede confirmação num diálogo
-  (resposta 50); desarquivar é na hora; o card arquivado ganha um aviso. Em tela larga são duas
-  colunas: à esquerda descrição, campos do tipo, tasks, relações, entrevista e briefing; à
-  direita, no painel "Detalhes do card", preso ao rolar, as propriedades (estado, prioridade,
-  responsável, progresso, datas e arquivar, uma embaixo da outra) e a feature. No celular, o
-  painel vem antes do conteúdo, como na ordem de leitura.
+  (resposta 50); desarquivar é na hora; o card arquivado ganha um aviso. O conteúdo vem em guias
+  (`CardWorkItem`): Detalhes, Relações (com a contagem), Anexos, Entrevista com IA e Briefing. Em
+  Detalhes, em tela larga, são duas colunas: à esquerda descrição, campos do tipo e subitens; à
+  direita, no painel "Detalhes do card", as propriedades (estado, prioridade, responsável,
+  progresso, datas e arquivar, uma embaixo da outra) e a feature. No celular, o painel vem antes
+  do conteúdo, como na ordem de leitura.
+- **Card em modal.** `CardDialog`, pelo `OpenedCardDialog` de `widgets/`: o identificador em cima
+  do título, o estado, o responsável e a prioridade embaixo, e à direita "Editar" (troca Detalhes
+  pelos campos de edição, sem sair da modal), o menu de três pontos com "Abrir em página inteira"
+  e o X. Fechar tira o `card` da URL; no board, relê as colunas.
+- **Anexos** (passo 11.4, feature `attachment`). Guia "Anexos" do card e seção "Anexos" do
+  subitem aberto, da feature e do epic: zona de soltar com "Escolher arquivos", envio um a um com
+  a barra de progresso, e a lista com nome, tamanho, quem enviou, data e as ações Visualizar (só
+  png, jpeg, gif e webp, por blob), Baixar e Excluir (com confirmação). Arquivo vazio ou acima de
+  20 MB vira um toast e não sai. O contrato está em `../Momentum.Core/ai/memory/incremental/anexos.md`;
+  o que não pode quebrar, no conhecimento `anexos-do-item`.
 - **Feature do card.** Um seletor com "Sem feature" e as features do projeto, que muda ao
   escolher. Embaixo, o link para a tela da feature e o epic dela, com link, ou "Sem epic". O
   progresso da feature não aparece aqui: ele mudaria a cada ação no card, e esta tela não
@@ -110,7 +123,8 @@ os formulários de criar e editar, com os campos de cada tipo. O contrato da API
   prioridade (começa em média), responsável (começa sem) e feature (começa sem, entre as do
   projeto). Trocar o tipo troca os campos na hora;
   o que foi digitado nos campos de outro tipo continua no formulário, mas só o grupo do tipo
-  escolhido vai no corpo. Depois de criar, a tela vai para o detalhe do card novo.
+  escolhido vai no corpo. Depois de criar, a tela vai para o board do projeto com o card novo
+  aberto na modal.
 - **Editar.** Só título, descrição e os campos do tipo. O tipo não muda (o formulário nem o
   mostra como campo), e estado, prioridade e responsável ficam no detalhe. O formulário manda o
   `updated_at` que leu como `expected_updated_at`, e o Core recusa a gravação se o card mudou

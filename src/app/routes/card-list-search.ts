@@ -9,6 +9,7 @@ export type CardListSearch = {
   feature?: string;
   arquivados?: true;
   pagina?: number;
+  card?: string;
 };
 
 const FIRST_PAGE = 1;
@@ -38,6 +39,7 @@ export function toCardListSearch(search: Record<string, unknown>): CardListSearc
     feature: readId(search.feature),
     arquivados: search.arquivados === true || undefined,
     pagina: readLaterPage(search.pagina),
+    card: readId(search.card),
   };
 }
 

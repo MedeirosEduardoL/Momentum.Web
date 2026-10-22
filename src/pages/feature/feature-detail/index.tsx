@@ -1,4 +1,5 @@
 import { Pencil } from "lucide-react";
+import { AttachmentPanel } from "@/features/attachment";
 import { FeatureDetail } from "@/features/feature";
 import { ButtonLink } from "@/shared/ui/button-link";
 import { renderFeatureCardsLink, reportingHierarchyLink } from "../feature-links";
@@ -25,6 +26,12 @@ export function FeatureDetailPage({ featureId, onProjectChange }: FeatureDetailP
       }
       renderBackLink={reportingHierarchyLink(onProjectChange)}
       renderCardsLink={renderFeatureCardsLink}
+      renderAttachments={feature => (
+        <AttachmentPanel
+          target={{ kind: "feature", id: feature.id }}
+          projectId={feature.projectId}
+        />
+      )}
     />
   );
 }

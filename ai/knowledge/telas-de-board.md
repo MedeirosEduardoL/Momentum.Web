@@ -3,12 +3,15 @@ id: telas-de-board
 titulo: O board escolhe quais cards aparecem, a feature de card os cria na primeira coluna e os move entre colunas e raias, e a tela relê as colunas depois de todo movimento e de todo card novo
 status: ativo
 criado: 2026-10-13
-atualizado: 2026-10-21
+atualizado: 2026-10-22
 touches:
   - src/features/card/ui/card-tile.tsx
   - src/features/card/ui/card-tile-subitem-buttons.tsx
   - src/features/card/ui/card-tile-subitem-list.tsx
   - src/features/card/ui/card-tile-subitem-form.tsx
+  - src/features/card/ui/card-tile-actions.tsx
+  - src/features/board/ui/board-access-dialog.tsx
+  - src/features/board/model/hooks/use-board-access.ts
   - src/features/board/api/board.service.ts
   - src/features/board/api/board.queries.ts
   - src/features/board/api/board.mutations.ts
@@ -77,6 +80,14 @@ simbolos:
   - BoardEpicInvalid
   - BoardLimitReached
   - CardChangedMeanwhile
+  - CardTileActions
+  - BoardAccessDialog
+  - useBoardAccess
+  - setBoardVisibility
+  - useListBoardMembers
+  - BoardMemberOutsideProject
+  - OpenedCardDialog
+  - useRefreshBoardColumns
 relacionados: [telas-de-card, telas-de-feature-e-epic, administracao-da-organizacao, guard-de-rota, carga-inicial]
 ---
 
@@ -92,6 +103,10 @@ relacionados: [telas-de-card, telas-de-feature-e-epic, administracao-da-organiza
 - Deixa o administrador do projeto criar, renomear, trocar o filtro e excluir boards, e guia quem
   acabou de criar um projeto, no primeiro acesso ou na área da organização, a criar o primeiro
   board dele.
+- É a tela principal do projeto (D-07 e ADR 0008 do Core): o card abre numa modal sobre o board,
+  e o menu de três pontos do cartão cria task, bug ou impedimento sem sair dele.
+- Deixa o administrador do projeto escolher quem vê o board (todo o time ou só as pessoas
+  escolhidas) e conferir, dar e tirar o acesso, pelo menu de três pontos do board.
 
 ## POR_QUE_EXISTE
 
@@ -158,6 +173,16 @@ relacionados: [telas-de-card, telas-de-feature-e-epic, administracao-da-organiza
   Critério salvo com mais de um valor não decide nada, porque qualquer um casa. A alternativa,
   abrir o formulário completo, foi descartada: o "New item" do Azure DevOps, a referência do
   usuário, pede só o título.
+- O menu de três pontos do cartão (pedido do usuário em 2026-10-22, passo 11.5) cria o primeiro
+  subitem de um tipo que o card ainda não tem, o que antes só a tela do card fazia: no VSTS, a
+  referência, o "Add task" fica no próprio cartão. Ele reaproveita a lista do cartão, que já cria
+  subitem, abrindo-a no tipo escolhido com o campo focado, em vez de um formulário próprio.
+- O card abre numa modal sobre o board, pelo `card` da URL (passo 11.6, ADR 0008 do Core): sair
+  do board a cada card aberto era o que o usuário chamou de "bagunçado", e o endereço com o card
+  aberto se recarrega e se compartilha. Fechar relê as colunas, porque a modal pode ter mudado o
+  card.
+- O acesso ao board (passo 11.9, ADR 0007 do Core) esconde o recorte e não os cards. A tela diz
+  isso no próprio diálogo, para ninguém usar o board restrito como sigilo.
 - Mesmo assim o card pode não casar com o filtro (o epic salvo, ou a escolha de outro tipo no
   formulário). A tela relê as colunas e procura o card nelas: se ele não voltou, o aviso diz que
   foi criado mas não casa com o filtro deste board, em vez de deixar a pessoa procurando. O aviso
@@ -183,9 +208,9 @@ relacionados: [telas-de-card, telas-de-feature-e-epic, administracao-da-organiza
 - INV-8: O board, o responsável e o agrupamento escolhidos vivem só na URL (`board`,
   `responsavel`, `agrupar`), validados por `toBoardSearch`; `responsavel` aceita um id ou
   `nenhum`, e valor desconhecido é descartado.
-- INV-9: Criar, editar e excluir board e editar colunas só aparecem quando `canAdministerProject`
-  aceita o projeto; editar, editar colunas e excluir ficam no menu de três pontos da barra do
-  board (`ActionMenu`).
+- INV-9: Criar, editar e excluir board, editar colunas e o acesso ao board só aparecem quando
+  `canAdministerProject` aceita o projeto; editar, editar colunas, acesso ao board e excluir ficam
+  no menu de três pontos da barra do board (`ActionMenu`).
 - INV-10: Excluir board só chama a API pelo `onConfirm` do `ConfirmDialog` que o item "Excluir"
   do menu abre (`useConfirmation`, o mesmo mecanismo do `ConfirmButton`).
 - INV-11: O `POST` e o `PATCH` de board levam o nome e o filtro inteiro, e do filtro só vão para o
@@ -248,10 +273,28 @@ relacionados: [telas-de-card, telas-de-feature-e-epic, administracao-da-organiza
   deixa o formulário com o tipo anterior.
 - INV-29: Com a lista de subitens aberta, o cartão não é arrastável: o campo de criar e as caixas
   de concluir ficam livres para o clique e a seleção de texto.
+- INV-32: Todo cartão tem, no topo, o menu de três pontos (`CardTileActions`, "Ações de
+  <identificador>") com "Adicionar task", "Adicionar bug" e "Adicionar impedimento", tenha o card
+  subitem do tipo ou não; escolher abre a lista daquele tipo no cartão com o campo de criar focado.
+- INV-33: O título do cartão é um link para o mesmo board com o `card` na URL, e o card aberto é o
+  `OpenedCardDialog` (`widgets/`), nunca outra tela. Fechar a modal tira o `card` da URL e relê
+  as colunas (`useRefreshBoardColumns`).
+- INV-34: O diálogo do acesso grava a escolha de quem vê pelo `PATCH` do board (`visibility`) e,
+  restrito, lista os administradores do projeto (sem "Tirar") e as pessoas escolhidas (com
+  "Tirar"); "Dar acesso a" só oferece quem é do time, não administra e ainda não foi escolhido.
+- INV-35: O selo "Acesso restrito" aparece na barra do board quando a `visibility` dele é
+  `members`, para todo mundo que vê o board.
 
 ## LIMITACOES
 
-- O cartão sem subitem não mostra botão: o primeiro subitem de um tipo se cria na tela do card.
+- O cartão só mostra botão para o tipo de subitem que o card tem; o primeiro de um tipo se cria
+  pelo menu de três pontos do cartão (INV-32).
+- O board restrito não esconde os cards: quem não o vê acha os mesmos cards na lista de cards e
+  em outro board (ADR 0007 do Core).
+- Quem perde o acesso a um board continua vendo-o até a lista de boards ser relida; aí o Core
+  responde 404, e a tela abre o primeiro board que a pessoa vê, com o aviso de board inexistente.
+- A lista de quem vê o board não mostra o administrador da organização que não está no time,
+  embora ele veja todo board.
 - Abrir os subitens de um card lê a lista dele toda (`GET /api/v1/cards/{cardId}/tasks`), e o
   cartão filtra o tipo; um card com muitos subitens lê todos para mostrar um tipo.
 - Coluna com mais de 100 cards mostra só os 100 mais novos, porque o Core não pagina a coluna. O
@@ -309,7 +352,11 @@ relacionados: [telas-de-card, telas-de-feature-e-epic, administracao-da-organiza
 ## VERIFICACAO
 
 - `npx vitest run src/features/card/ui/card-tile.test.tsx` cobre os botões por tipo, a leitura só
-  ao abrir, a releitura das colunas e o cartão parado com a lista aberta (INV-27 a INV-29).
+  ao abrir, a releitura das colunas, o cartão parado com a lista aberta e o menu de três pontos
+  (INV-27 a INV-29, INV-32).
+- `npx vitest run src/features/board/ui/project-board.test.tsx` cobre o item "Acesso ao board", o
+  diálogo e o selo (INV-9, INV-34, INV-35); `rg -n "OpenedCardDialog|refreshColumns"
+  src/pages/board/project-board/index.tsx` mostra a modal e a releitura ao fechar (INV-33).
 - `npx vitest run src/features/board src/app/stores src/app/routes/home.routes.test.tsx
   src/features/card/model/hooks/use-move-card.test.ts
   src/features/card/model/hooks/use-card-drag.test.ts
@@ -334,8 +381,8 @@ relacionados: [telas-de-card, telas-de-feature-e-epic, administracao-da-organiza
   de tipo antes de criar (INV-31), e `src/features/board/ui/project-board.test.tsx`, o menu e a
   edição das colunas (INV-9, INV-30).
 - `rg -n "onSuccess|onError" src/features/board/api/board.mutations.ts` mostra `refreshBoardLists`
-  na criação e na exclusão, `refreshBoards` na alteração e `refreshEverything` nos três erros
-  (INV-12).
+  na criação e na exclusão, `refreshBoards` na alteração, no acesso e nas pessoas escolhidas, e
+  `refreshEverything` em todos os erros (INV-12).
 - `rg -n "@/features/board" src/app` só devolve linhas `import type` (INV-13).
 - `rg -n "MarkdownContent|MarkdownSection|dangerouslySetInnerHTML"
   src/features/card/ui/card-tile.tsx src/features/card/ui/card-lane-row.tsx

@@ -17,9 +17,9 @@ conta.
 - Fica na área `member`. Chega-se a ela pelo nome do projeto e pelo link "Boards" na página
   inicial, pelo nome do projeto na aba "Projetos" da organização e pelo item "Boards" da navegação
   lateral; por isso a tela não tem link "Voltar".
-- O board aberto, o responsável e o agrupamento são parâmetros da URL: `board` (o id do board),
-  `responsavel` (o id da pessoa, ou `nenhum` para só os cards sem responsável) e
-  `agrupar=responsavel`. O padrão não vai para a URL: sem `board` vale o primeiro board do
+- O board aberto, o responsável, o agrupamento e o card aberto são parâmetros da URL: `board` (o id
+  do board), `responsavel` (o id da pessoa, ou `nenhum` para só os cards sem responsável),
+  `agrupar=responsavel` e `card` (o id do card aberto na modal, passo 11.6). O padrão não vai para a URL: sem `board` vale o primeiro board do
   projeto, na ordem de criação. `board` fica em inglês porque é o termo do glossário.
 - `app/routes/board-search.ts` valida a URL e traduz para a visão da feature (`BoardView`, com
   `assigneeId` ou `isUnassigned`), e de volta. O que não é id, `nenhum` nem `responsavel` é
@@ -71,10 +71,10 @@ conta.
   board"; quem não administra vê a explicação e o link para a lista de cards.
 - **Board aberto.** No topo, uma barra numa linha que quebra, com os seletores "Board",
   "Responsável" (começa em "Todos"; depois vêm "Sem responsável" e o time) e "Agrupar por", cada
-  um com o rótulo ao lado, e, à direita, para quem administra, o menu de três pontos com "Editar
-  board", "Editar colunas" (os estados do projeto, num diálogo largo, com criar, renomear,
-  reordenar, mudar a categoria e excluir; valem para todos os boards) e "Excluir", que pede
-  confirmação; "Novo board" fica no cabeçalho da tela. Embaixo, uma coluna por estado, na ordem do
+  um com o rótulo ao lado, e, à direita, o selo "Acesso restrito" quando o board é só das pessoas
+  escolhidas e, para quem administra, o menu de três pontos com "Editar board", "Editar colunas"
+  (os estados do projeto, num diálogo largo, com criar, renomear, reordenar, mudar a categoria e
+  excluir; valem para todos os boards), "Acesso ao board" e "Excluir", que pede confirmação; "Novo board" fica no cabeçalho da tela. Embaixo, uma coluna por estado, na ordem do
   fluxo, esticada até preencher a largura (no mínimo 256 px; quando não cabem, a área das colunas
   rola na horizontal). O cabeçalho da coluna tem o nome, o total numa pílula e um traço em cima no
   tom da categoria do estado. A coluna é uma zona rebaixada, e o cartão, de vidro com a borda
@@ -91,6 +91,18 @@ conta.
   colunas são relidas. Um toast diz "O card MOM-12 foi criado." ou, se o card não voltou nas
   colunas relidas, "O card MOM-12 foi criado, mas não casa com o filtro deste board."; os dois
   têm "Abrir o card".
+- **Abrir o card.** O título do cartão leva ao mesmo board com `card` na URL, e o card abre na
+  modal (`OpenedCardDialog`), com as guias; fechar pelo X, Esc ou clique fora tira o `card` da URL
+  e relê as colunas.
+- **Menu do cartão** (passo 11.5). Os três pontos no topo do cartão, ao lado da prioridade, com
+  "Adicionar task", "Adicionar bug" e "Adicionar impedimento", também no card que ainda não tem
+  subitem do tipo: abre a lista do tipo no cartão com o campo de criar focado. O menu flutua num
+  portal acima das colunas, para não ser cortado pela rolagem delas.
+- **Acesso ao board** (passo 11.9). Diálogo com "Todo o time do projeto" ou "Só as pessoas
+  escolhidas"; trocar grava na hora. Restrito, lista os administradores do projeto (que sempre
+  veem) e as pessoas escolhidas, com "Tirar", e embaixo "Dar acesso a" com quem do time ainda não
+  vê; aberto, lista o time inteiro. Os cards do board seguem visíveis a todo o time na lista de
+  cards, e o diálogo diz isso.
 - **Subitens no cartão** (passo 6.7, como o checklist do card no VSTS). Um botão por tipo que o
   card tem, com ícone e concluídos sobre o total ("Tasks 2/5", "Bugs 0/1", "Impedimentos 1/1"),
   vindo do `subitem_counts` do resumo; o de impedimentos fica em `danger-soft` enquanto há
@@ -307,5 +319,6 @@ conta.
 ## Ainda não existe
 
 - Resumo do filtro do board na tela, para quem não administra.
+- Acesso por board que esconda também os cards (ADR 0007 do Core: não é objetivo).
 - Raia por outro critério (feature, prioridade).
 - Paginação da coluna e ordem manual dos cards: não existem no Core.

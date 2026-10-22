@@ -13,6 +13,7 @@ type CardTileSubitemListProps = {
   card: CardSummary;
   kind: CardTaskKind;
   assigneeOptions: SelectOption[];
+  shouldFocusForm?: boolean;
   onChanged: () => void;
 };
 
@@ -20,6 +21,7 @@ export function CardTileSubitemList({
   card,
   kind,
   assigneeOptions,
+  shouldFocusForm = false,
   onChanged,
 }: CardTileSubitemListProps) {
   const tasks = useListCardTasks(card.id);
@@ -75,7 +77,12 @@ export function CardTileSubitemList({
           ))}
         </ul>
       )}
-      <CardTileSubitemForm card={card} kind={kind} onCreated={onChanged} />
+      <CardTileSubitemForm
+        card={card}
+        kind={kind}
+        shouldFocus={shouldFocusForm}
+        onCreated={onChanged}
+      />
       {openTask && (
         <CardTaskDialog
           key={openTask.id}

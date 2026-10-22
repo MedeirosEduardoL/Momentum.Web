@@ -7,7 +7,7 @@ import { ValueReporter } from "@/shared/ui/value-reporter";
 export function renderHierarchyLink(projectId: string) {
   return (
     <TextLink to="/projetos/$projectId/features" params={{ projectId }}>
-      Voltar para epics e features
+      Voltar para features e epics
     </TextLink>
   );
 }

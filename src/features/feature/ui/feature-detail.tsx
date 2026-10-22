@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { MarkdownSection } from "@/shared/ui/markdown-section";
 import { QueryContent } from "@/shared/ui/query-content";
 import { Screen } from "@/shared/ui/screen";
+import { Section } from "@/shared/ui/section";
 import { useGetFeature } from "../api/feature.queries";
 import type { Feature, FeatureSummary } from "../model/types/feature.types";
 import { FeatureProperties } from "./feature-properties";
@@ -10,6 +11,7 @@ type FeatureDetailLinks = {
   editLink: ReactNode;
   renderBackLink: (projectId: string) => ReactNode;
   renderCardsLink: (feature: FeatureSummary) => ReactNode;
+  renderAttachments: (feature: FeatureSummary) => ReactNode;
 };
 
 type FeatureDetailProps = FeatureDetailLinks & {
@@ -20,7 +22,13 @@ type FeatureScreenProps = FeatureDetailLinks & {
   feature: Feature;
 };
 
-function FeatureScreen({ feature, editLink, renderBackLink, renderCardsLink }: FeatureScreenProps) {
+function FeatureScreen({
+  feature,
+  editLink,
+  renderBackLink,
+  renderCardsLink,
+  renderAttachments,
+}: FeatureScreenProps) {
   return (
     <Screen
       backLink={renderBackLink(feature.projectId)}
@@ -30,6 +38,7 @@ function FeatureScreen({ feature, editLink, renderBackLink, renderCardsLink }: F
     >
       <FeatureProperties feature={feature} cardsLink={renderCardsLink(feature)} />
       <MarkdownSection title="Descrição" content={feature.description} emptyText="Sem descrição." />
+      <Section title="Anexos">{renderAttachments(feature)}</Section>
     </Screen>
   );
 }

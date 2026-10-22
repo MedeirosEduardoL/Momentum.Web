@@ -1,4 +1,5 @@
 import { Plus } from "lucide-react";
+import { useEffect } from "react";
 import { Button } from "@/shared/ui/button";
 import { TextField } from "@/shared/ui/text-field";
 import { useCreateCardTask } from "../model/hooks/use-create-card-task";
@@ -9,11 +10,23 @@ import type { CardSummary, CardTaskKind } from "../model/types/card.types";
 type CardTileSubitemFormProps = {
   card: CardSummary;
   kind: CardTaskKind;
+  shouldFocus?: boolean;
   onCreated: () => void;
 };
 
-export function CardTileSubitemForm({ card, kind, onCreated }: CardTileSubitemFormProps) {
+export function CardTileSubitemForm({
+  card,
+  kind,
+  shouldFocus = false,
+  onCreated,
+}: CardTileSubitemFormProps) {
   const { form, onSubmit, isSaving } = useCreateCardTask(card, { kind, onCreated });
+
+  useEffect(() => {
+    if (shouldFocus) {
+      form.setFocus("title");
+    }
+  }, [form, shouldFocus]);
 
   return (
     <form onSubmit={onSubmit} noValidate className="flex items-start gap-1">

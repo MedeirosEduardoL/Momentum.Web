@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { BoardColumnsQuery } from "../model/types/board.types";
 import { boardKeys } from "./board-api-keys";
-import { listBoardColumns, listBoards } from "./board.service";
+import { listBoardColumns, listBoardMembers, listBoards } from "./board.service";
 
 const DERIVED_FROM_CARDS_STALE_TIME = 0;
 
@@ -17,5 +17,18 @@ export function useListBoardColumns(query: BoardColumnsQuery) {
     queryKey: boardKeys.columns(query),
     queryFn: () => listBoardColumns(query),
     staleTime: DERIVED_FROM_CARDS_STALE_TIME,
+  });
+}
+
+export function useRefreshBoardColumns() {
+  const queryClient = useQueryClient();
+
+  return () => queryClient.invalidateQueries({ queryKey: boardKeys.allColumns() });
+}
+
+export function useListBoardMembers(boardId: string) {
+  return useQuery({
+    queryKey: boardKeys.members(boardId),
+    queryFn: () => listBoardMembers(boardId),
   });
 }

@@ -3,7 +3,7 @@ id: telas-de-card
 titulo: A tela do card mostra texto de terceiros só sanitizado, grava no Core sem apagar o que não mudou nem o que outra pessoa mudou, muda tasks, relações, feature e estados pelas rotas próprias e acha o outro card de uma relação pela busca, sem arquivados
 status: ativo
 criado: 2026-10-13
-atualizado: 2026-10-21
+atualizado: 2026-10-22
 touches:
   - src/features/card/api/card.service.ts
   - src/features/card/api/card-task.service.ts
@@ -19,6 +19,13 @@ touches:
   - src/features/card/model/hooks/use-create-card.ts
   - src/features/card/ui/card-relation-form.tsx
   - src/features/card/ui/card-detail.tsx
+  - src/features/card/ui/card-dialog.tsx
+  - src/features/card/ui/card-work-item.tsx
+  - src/features/card/ui/card-details-tab.tsx
+  - src/features/card/ui/card-edit-fields.tsx
+  - src/features/card/model/contexts/card-extensions-context.ts
+  - src/widgets/card-panels.tsx
+  - src/widgets/opened-card-dialog.tsx
   - src/features/card/ui/card-properties.tsx
   - src/features/card/ui/card-type-details.tsx
   - src/features/card/ui/card-task-row.tsx
@@ -68,6 +75,14 @@ simbolos:
   - cardKeys
   - ValueReporter
   - onProjectChange
+  - CardDialog
+  - CardWorkItem
+  - CardWorkItemTab
+  - CardWorkItemRenderers
+  - CardExtensionsProvider
+  - useCardExtensions
+  - cardPanels
+  - cardExtensions
 relacionados: [guard-de-rota, telas-de-feature-e-epic, telas-de-board, entrevista-do-card]
 ---
 
@@ -78,6 +93,8 @@ relacionados: [guard-de-rota, telas-de-feature-e-epic, telas-de-board, entrevist
 - Garante que gravar um card não apague campo que a pessoa não mexeu.
 - Mostra e altera, no detalhe, as tasks, as relações e a feature do card, e deixa escolher a
   feature já no card novo.
+- Abre o card numa modal sobre o board e a lista, com X para fechar, e organiza o que ele mostra em
+  guias: Detalhes, Relações, Anexos, Entrevista com IA e Briefing (D-07 e ADR 0008 do Core).
 
 ## POR_QUE_EXISTE
 
@@ -122,6 +139,20 @@ relacionados: [guard-de-rota, telas-de-feature-e-epic, telas-de-board, entrevist
   `app` não lê o card (INV-9). A página do detalhe informa o projeto quando o card carrega, pelo
   `ValueReporter` de `shared/ui`, chamando o `onProjectChange` que a rota entrega: a action do
   `useProjectContextStore`.
+
+- O card aberto era uma tela empilhada, com entrevista, briefing e subitens numa coluna longa, e
+  abrir um card tirava a pessoa do board (passos 11.4 e 11.6). A modal com guias, como o work item
+  do VSTS, foi a forma pedida pelo usuário; o endereço com `?card=` deixa recarregar e
+  compartilhar. A página própria do card (`/cards/$cardId`) continua, com as mesmas guias, para
+  "Abrir em página inteira".
+- Entrevista, briefing e anexos são de outras features, que a feature `card` não pode importar
+  (camadas FSD). Por isso chegam como render props (`CardWorkItemRenderers`), montadas uma vez em
+  `widgets/card-panels.tsx` e espalhadas pela página do card e pelo `OpenedCardDialog`. Os anexos
+  do subitem aparecem dentro do `CardTaskDialog`, fundo demais para descer por props: chegam pelo
+  contexto `CardExtensions`, que a página ou o widget fornece.
+- As guias já visitadas ficam montadas e só se escondem (`Tabs` de `shared/ui`): trocar de guia no
+  meio de uma rodada da entrevista ou da geração do briefing não pode cancelar o stream nem perder
+  o que foi digitado.
 
 ## INVARIANTES
 
@@ -183,6 +214,15 @@ relacionados: [guard-de-rota, telas-de-feature-e-epic, telas-de-board, entrevist
 - INV-23: O formulário de criar subitem da tela do card diz o tipo que vai criar no rótulo do
   campo ("Nova task", "Novo bug", "Novo impedimento") e no botão ("Adicionar bug"), e o tipo
   escolhido continua valendo para o próximo.
+- INV-24: O card aberto sobre o board ou a lista é sempre o `OpenedCardDialog` (`widgets/`), com o
+  `CardDialog` da feature e os `cardPanels`; abre e fecha pelo `card` da URL, e o "Abrir em página
+  inteira" leva a `/cards/$cardId`.
+- INV-25: O conteúdo do card, na modal e na página, é o `CardWorkItem`, com as guias Detalhes,
+  Relações, Anexos, Entrevista com IA e Briefing. Na modal, "Editar" troca só o conteúdo de
+  Detalhes pelos campos de edição (`CardEditFields`); na página, editar continua sendo a tela de
+  edição, que usa os mesmos campos.
+- INV-26: A feature `card` não importa `attachment`, `card-interview` nem `card-brief`: o que vem
+  delas entra por `CardWorkItemRenderers` e pelo contexto `CardExtensions`.
 
 ## LIMITACOES
 
@@ -214,6 +254,9 @@ relacionados: [guard-de-rota, telas-de-feature-e-epic, telas-de-board, entrevist
 - A lista de tasks não tem reordenação nem edição em lote: o Core devolve na ordem de criação.
 - Aberto direto pelo endereço, o card mostra a navegação sem o projeto, ou com o último projeto
   aberto, até o card carregar.
+- A guia aberta da modal não vai para a URL: recarregar com `?card=` abre o card em Detalhes.
+- Sem o `CardExtensionsProvider` (fora da página do card e do `OpenedCardDialog`), o subitem aberto
+  não mostra anexos.
 
 ## OBJETIVOS
 
@@ -230,8 +273,12 @@ relacionados: [guard-de-rota, telas-de-feature-e-epic, telas-de-board, entrevist
 - `npx vitest run src/features/card src/app/routes/card-list-search.test.ts`
 - `rg -n "dangerouslySetInnerHTML" src --glob '!**/*.test.*'` só devolve
   `src/shared/ui/markdown-content.tsx` (INV-1).
-- Em `src/features/card/ui/card-detail.tsx` e `card-type-details.tsx`, `description` e os campos de
-  texto de `fields` só aparecem como `content=` de `MarkdownSection` ou `MarkdownContent` (INV-1).
+- Em `src/features/card/ui/card-details-tab.tsx` e `card-type-details.tsx`, `description` e os
+  campos de texto de `fields` só aparecem como `content=` de `MarkdownSection` ou
+  `MarkdownContent` (INV-1).
+- `npx vitest run src/features/card/ui/card-dialog.test.tsx` cobre a modal, as guias, a edição e o
+  "Abrir em página inteira" (INV-24, INV-25); `rg -n "@/features/(attachment|card-interview|card-brief)"
+  src/features/card` não devolve nada (INV-26).
 - `rg -n "assignee" src/features/card/api/card.service.ts` não mostra `assignee_id` no corpo de
   `updateCard` (INV-4).
 - `rg -c "onSettled: refreshCards" src/features/card/api/card.mutations.ts` devolve 10, uma por

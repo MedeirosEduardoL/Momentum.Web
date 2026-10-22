@@ -29,6 +29,14 @@ function ProjectBoardRoute() {
           search: fromBoardView(view),
         })
       }
+      openCardId={search.card}
+      onOpenCardChange={cardId =>
+        navigate({
+          to: "/projetos/$projectId/boards",
+          params: { projectId },
+          search: previous => ({ ...previous, card: cardId }),
+        })
+      }
     />
   );
 }

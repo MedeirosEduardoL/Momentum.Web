@@ -6,19 +6,17 @@ a entrevista da IA com o P.O sobre o card e os arquivos `.md` gerados para o des
 chamados de cada pessoa virão, no futuro, pela integração com o Megabrain. Consome a API do Momentum.Core,
 repositório irmão em `../Momentum.Core`, pelo contrato `openapi.json` gerado lá.
 
-**Estado (2026-10-20): Fase 3 e as telas das Fases 4 a 8 entregues no Web — identidade, acesso,
-configurações da organização, cards, a hierarquia de epic, feature e task, o board, a entrevista e
-o briefing do card (passos 3.3, 3.4, 3.6, 3.8, 4.4, 4.6, 5.4, 5.6, 6.2 a 6.4, 7.4 a 7.6, 8.2 e 8.4).** Existem as telas de cadastro, confirmação de e-mail, login, troca de
-senha, primeiro acesso, aceite de convite, a lista de projetos, a área da organização (membros,
-convites, projetos, o time e os estados de cada projeto), as de card (lista com filtros, detalhe com as ações,
-as tasks, as relações e a feature do card, e formulário por tipo), as de epic e feature
-(hierarquia do projeto, a tela de cada um e as de criar e editar) e a dos boards do projeto (colunas por estado,
-arrastar entre colunas e raias, visão por responsável, administração dos boards e o diálogo do
-primeiro board depois de "Novo projeto" e no fim do primeiro acesso) e o painel da
-entrevista no card, com a marcação de quem pode usar a IA, e a seção do briefing, com cópia e
-download do `MOM-123.md`, com sessão e guard de rota, no layout com a identidade do Megabrain e
-a estrutura do Azure DevOps (`DESIGN.md`), tema claro e escuro; os chamados e a análise de código ainda
-não. As regras descrevem a
+**Estado (2026-10-22): Fase 3, as telas das Fases 4 a 8 e o beta (Fase 11) entregues no Web.**
+Existem as telas de cadastro, confirmação de e-mail, login, troca de senha, primeiro acesso,
+aceite de convite, a lista de projetos, a área da organização (membros, convites, projetos, o
+time e os estados de cada projeto), os boards do projeto como tela principal (colunas por
+estado, arrastar entre colunas e raias, menu de três pontos no cartão, acesso por board), o card
+aberto em modal com guias (detalhes, relações, anexos, entrevista com IA e briefing) sobre o board
+e a lista, a lista de cards, os formulários de card, as telas de feature e de epic, com os boards
+de features e de epics ao lado da hierarquia, e os anexos de card, subitem, feature e epic, com
+sessão e guard de rota, no layout com a paleta do Megabrain, o acabamento do Linear e do YouTrack
+e o comportamento do Azure DevOps (`DESIGN.md`), tema claro e escuro; os chamados e a análise de
+código ainda não. As regras descrevem a
 arquitetura-alvo; o código nasce pelas fases do roadmap do produto. Comando que depende de arquivo ainda inexistente falha — confira em que passo ele
 nasce antes de concluir que algo quebrou.
 

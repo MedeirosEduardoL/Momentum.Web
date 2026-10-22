@@ -6,6 +6,7 @@ import type { CardMoveHandler, CardSummary, CardTaskKind } from "../model/types/
 import { CardAssigneeChip } from "./card-assignee-chip";
 import { CardIdentifier } from "./card-identifier";
 import { CardPriorityBadge } from "./card-priority-badge";
+import { CardTileActions } from "./card-tile-actions";
 import { CardTileSubitemButtons } from "./card-tile-subitem-buttons";
 import { CardTileSubitemList } from "./card-tile-subitem-list";
 
@@ -35,9 +36,16 @@ export function CardTile({
   onSubitemsChanged,
 }: CardTileProps) {
   const [openKind, setOpenKind] = useState<CardTaskKind | null>(null);
+  const [addingKind, setAddingKind] = useState<CardTaskKind | null>(null);
 
   function toggleKind(kind: CardTaskKind) {
+    setAddingKind(null);
     setOpenKind(current => (current === kind ? null : kind));
+  }
+
+  function addSubitem(kind: CardTaskKind) {
+    setAddingKind(kind);
+    setOpenKind(kind);
   }
 
   return (
@@ -54,7 +62,10 @@ export function CardTile({
     >
       <div className="flex items-center justify-between gap-2">
         <CardIdentifier card={card} hasTypeMark={false} />
-        <CardPriorityBadge priority={card.priority} />
+        <div className="-my-1 -mr-1 flex items-center gap-1">
+          <CardPriorityBadge priority={card.priority} />
+          <CardTileActions card={card} onAddSubitem={addSubitem} />
+        </div>
       </div>
       <span className="font-medium break-words">{titleLink}</span>
       <CardTileSubitemButtons card={card} openKind={openKind} onToggle={toggleKind} />
@@ -64,6 +75,7 @@ export function CardTile({
           card={card}
           kind={openKind}
           assigneeOptions={assigneeOptions}
+          shouldFocusForm={addingKind === openKind}
           onChanged={onSubitemsChanged}
         />
       )}
