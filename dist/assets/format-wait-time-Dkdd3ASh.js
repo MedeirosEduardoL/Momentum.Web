@@ -1,1 +1,0 @@
-import{t as e}from"./format-count-Bl4WDP5N.js";var t=60,n=60,r=24;function i(i){let a=Math.max(1,Math.ceil(i));if(a<t)return e(a,`segundo`);let o=Math.ceil(a/t);if(o<n)return e(o,`minuto`);let s=Math.ceil(o/n);return s<r?e(s,`hora`):e(Math.ceil(s/r),`dia`)}export{i as t};

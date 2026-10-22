@@ -1,1 +1,0 @@
-var e=/\{(\w+)\}/g;function t(t,n){return t.replace(e,(e,t)=>encodeURIComponent(n[t]))}export{t};

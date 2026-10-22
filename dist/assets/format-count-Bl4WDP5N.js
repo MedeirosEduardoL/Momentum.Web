@@ -1,1 +1,0 @@
-function e(e,t){return e===1?`1 ${t}`:`${e} ${t}s`}export{e as t};

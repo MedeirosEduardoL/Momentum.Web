@@ -1,1 +1,0 @@
-var e={administrator:`Administrador do projeto`,member:`Membro`},t=[{value:`member`,label:e.member},{value:`administrator`,label:e.administrator}];function n(e){return e.role===`administrator`}export{t as n,n as r,e as t};

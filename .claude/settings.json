@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh\"",
+            "timeout": 60
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-read.sh\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-edit.sh\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/quality-gate.sh\"",
+            "timeout": 300
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "additionalDirectories": ["../Momentum.Core"],
+    "allow": [
+      "Bash(npm run typecheck:*)", "Bash(npm run lint:*)", "Bash(npm run format:*)",
+      "Bash(npm run test:*)", "Bash(npm test:*)", "Bash(npm run build:*)", "Bash(npm run quality:*)",
+      "Bash(npx vitest:*)", "Bash(npx eslint:*)", "Bash(npx prettier:*)", "Bash(npx tsc:*)",
+      "Bash(git status:*)", "Bash(git diff:*)", "Bash(git log:*)", "Bash(git show:*)",
+      "Bash(git ls-files:*)", "Bash(git rev-parse:*)", "Bash(git merge-base:*)",
+      "Bash(git -C ../Momentum.Core status:*)", "Bash(git -C ../Momentum.Core diff:*)",
+      "Bash(git -C ../Momentum.Core log:*)",
+      "Bash(rg:*)",
+      "Bash(bash ai/scripts/check-diff-rules.sh:*)",
+      "Bash(bash ai/scripts/knowledge-match.sh:*)",
+      "Bash(gh issue view:*)", "Bash(gh issue list:*)",
+      "Bash(gh pr view:*)", "Bash(gh pr diff:*)"
+    ],
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(npm install:*)",
+      "Bash(npm i:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(npm update:*)"
+    ],
+    "deny": [
+      "Read(.env)",
+      "Read(.env.local)",
+      "Read(.env.development)",
+      "Read(.env.production)",
+      "Edit(.env)",
+      "Edit(.env.local)"
+    ]
+  }
+}
