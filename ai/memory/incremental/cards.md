@@ -96,7 +96,8 @@ os formulários de criar e editar, com os campos de cada tipo. O contrato da API
   subitem aberto, da feature e do epic: zona de soltar com "Escolher arquivos", envio um a um com
   a barra de progresso, e a lista com nome, tamanho, quem enviou, data e as ações Visualizar (só
   png, jpeg, gif e webp, por blob), Baixar e Excluir (com confirmação). Arquivo vazio ou acima de
-  20 MB vira um toast e não sai. O contrato está em `../Momentum.Core/ai/memory/incremental/anexos.md`;
+  20 MB vira um toast e não sai. A cota de 2 GB por organização, o disco cheio e os limites por
+  pessoa do Kong voltam do Core como recusa e aparecem no mesmo toast. O contrato está em `../Momentum.Core/ai/memory/incremental/anexos.md`;
   o que não pode quebrar, no conhecimento `anexos-do-item`.
 - **Feature do card.** Um seletor com "Sem feature" e as features do projeto, que muda ao
   escolher. Embaixo, o link para a tela da feature e o epic dela, com link, ou "Sem epic". O
