@@ -36,7 +36,7 @@ numa modal com X sobre o board e a lista (`?card=`), com as guias Detalhes, Rela
 Entrevista com IA e Briefing, e "Abrir em página inteira"; o menu de três pontos do cartão
 adiciona task, bug ou impedimento; features e epics também aparecem em board, ao lado da
 hierarquia; card, subitem, feature e epic recebem anexos; e o administrador do projeto escolhe
-quem vê cada board. A paleta passou ao coral do Megabrain. Na área da organização, todo membro vê os membros, os projetos em que está e o
+quem vê cada board. A paleta continua a índigo do Megabrain. Na área da organização, todo membro vê os membros, os projetos em que está e o
 time deles; o administrador da organização muda papéis, marca quem pode usar a IA, remove
 membros, convida, cria projetos e cuida dos times, e o administrador do projeto cuida do time
 dele.

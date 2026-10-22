@@ -22,11 +22,13 @@ no `DESIGN.md`; o inventário, em `.claude/rules/shared-ui.md`. Aqui fica o que 
   `transparent`.
 - Opacidade sobre token (`bg-canvas/75`, `hover:bg-danger/90`) é permitida e não conta como valor
   arbitrário.
-- A paleta é a do Megabrain desde 2026-10-22 (passo 11.3): neutros quentes e o coral no matiz 28.
-  O botão primário usa `action` (neutro escuro), não o `accent`, e `accent-hover` e `accent-ink`
-  saíram junto com o preenchimento coral. Os contrastes do `DESIGN.md` saem de converter OKLCH
-  para sRGB e calcular a razão WCAG contra `canvas`, `canvas-deep`, `well`, `surface` e
-  `surface-raised`; mudou um token, recalcule a tabela.
+- A paleta é a do Megabrain.Web, papel por papel: os valores de `src/styles/tokens.css` de lá
+  (`../../DatoraSource/Megabrain.Web`), índigo frio nos matizes 275 e 282, com o botão primário
+  preenchido de `accent`. Em 2026-10-22 ela foi trocada por engano pelo coral de uma versão antiga
+  do Megabrain e voltou no mesmo dia: antes de mudar uma cor, atualize o Megabrain.Web e confira
+  o `tokens.css` atual. Os contrastes do `DESIGN.md` saem de converter OKLCH para sRGB e calcular
+  a razão WCAG contra `canvas`, `canvas-deep`, `well`, `surface` e `surface-raised`; mudou um
+  token, recalcule a tabela.
 
 ## Componentes
 

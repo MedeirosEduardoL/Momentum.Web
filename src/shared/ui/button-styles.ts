@@ -10,7 +10,7 @@ export type ButtonStyle = {
 };
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
-  primary: "bg-action text-action-ink hover:bg-action-hover",
+  primary: "bg-accent text-accent-ink hover:bg-accent-hover",
   secondary: "glass-control border border-line-strong text-ink hover:bg-surface-raised",
   ghost: "text-ink-muted hover:bg-surface-raised hover:text-ink",
   danger: "bg-danger text-canvas hover:bg-danger/90",

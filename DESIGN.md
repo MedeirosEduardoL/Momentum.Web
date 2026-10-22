@@ -3,8 +3,9 @@
 Direção visual do Momentum.Web, decidida pelo usuário para o beta em 2026-10-22 (D-07 e ADR 0008
 do Core, `../Momentum.Core/docs/adr/0008-board-como-tela-principal-e-card-em-modal.md`): o
 acabamento do Linear e do YouTrack, o design system e a paleta do Megabrain e o comportamento do
-Azure DevOps (VSTS). Substitui a de 2026-10-19 (identidade do Megabrain.Web em índigo sobre a
-estrutura do Azure DevOps), que por sua vez substituiu a de 2026-10-03 (pergunta 6 do roadmap).
+Azure DevOps (VSTS). Mantém a paleta índigo do Megabrain.Web adotada em 2026-10-19, que substituiu
+a direção de 2026-10-03 (pergunta 6 do roadmap). Os tokens de cor são os de
+`Megabrain.Web/src/styles/tokens.css`, papel por papel; confira lá antes de mudar uma cor.
 Os tokens moram em `@theme static` de `src/index.css`; os componentes de base, em `src/shared/ui`,
 com o inventário em `.claude/rules/shared-ui.md`.
 
@@ -13,10 +14,9 @@ com o inventário em `.claude/rules/shared-ui.md`.
 - **Ícone:** lua crescente — `Moon` do lucide-react na interface e `public/favicon.svg` no
   navegador.
 - **Versão de lançamento:** v1.0.0, "Las Noches".
-- **Lane:** a paleta do Megabrain — coral no matiz 28 sobre neutros quentes, superfícies de vidro,
-  brilho coral discreto no fundo escuro — com o acabamento enxuto do Linear e do YouTrack (ação
-  principal neutra e escura, coral só para seleção e foco, pouca borda), sobre o comportamento do
-  Azure DevOps: o board como tela principal, o card aberto numa modal com guias, menu de três
+- **Lane:** a paleta do Megabrain — índigo frio e sóbrio (matizes 275 e 282), superfícies de
+  vidro, brilho discreto no fundo escuro — com o acabamento enxuto do Linear e do YouTrack (pouca
+  borda, um accent só, a interface recua), sobre o comportamento do Azure DevOps: o board como tela principal, o card aberto numa modal com guias, menu de três
   pontos no cartão e no board, a cor do tipo na borda do card. Denso como uma ferramenta de
   trabalho: o card é o destaque, a interface recua.
 
@@ -89,52 +89,51 @@ clara. Uma CSP futura precisa do hash desse script.
 ## Cor
 
 Tokens em OKLCH, com a paleta padrão do Tailwind removida (`--color-*: initial`): `bg-zinc-900`
-não existe. Neutros quentes, puxados para o coral do Megabrain (matiz 28).
+não existe. Neutros frios, puxados para o índigo (matiz 275), com os mesmos valores do Megabrain.
 
 | Token | Claro | Escuro | Papel |
 | --- | --- | --- | --- |
-| `canvas` | `oklch(0.95 0.004 28)` | `oklch(0.105 0.005 28)` | Fundo da aplicação |
-| `canvas-deep` | `oklch(0.925 0.006 28)` | `oklch(0.075 0.004 28)` | Fim do degradê do fundo |
-| `well` | `oklch(0.915 0.008 28)` | `oklch(0.135 0.007 28)` | Zona rebaixada (coluna do board): mais escura que o fundo no claro, mais clara no escuro |
-| `surface` | `oklch(0.985 0.003 28)` | `oklch(0.155 0.008 28)` | Superfície opaca |
-| `surface-raised` | `oklch(0.915 0.008 28)` | `oklch(0.205 0.01 28)` | Hover, item ativo, opção escolhida, badge neutro |
-| `line` | `oklch(0.85 0.01 28)` | `oklch(0.25 0.01 28)` | Divisória |
-| `line-strong` | `oklch(0.6 0.012 28)` | `oklch(0.53 0.012 28)` | Borda de campo e de controle |
-| `ink` | `oklch(0.2 0.009 28)` | `oklch(0.93 0.006 28)` | Texto principal |
-| `ink-muted` | `oklch(0.4 0.01 28)` | `oklch(0.75 0.008 28)` | Texto secundário |
-| `ink-subtle` | `oklch(0.47 0.01 28)` | `oklch(0.63 0.008 28)` | Metadado, placeholder |
-| `action` | `oklch(0.28 0.012 28)` | `oklch(0.32 0.012 28)` | Preenchimento da ação primária |
-| `action-hover` | `oklch(0.34 0.014 28)` | `oklch(0.39 0.014 28)` | Hover da ação primária |
-| `action-ink` | `oklch(0.97 0.004 28)` | `oklch(0.95 0.005 28)` | Texto sobre `action` |
-| `accent` | `oklch(0.48 0.18 28)` | `oklch(0.57 0.18 28)` | Traço da aba ativa |
-| `accent-text` | `oklch(0.43 0.17 28)` | `oklch(0.76 0.14 28)` | Link, anel de foco, aba e ícone ativos, borda da opção escolhida |
-| `accent-soft` | `oklch(0.91 0.045 28)` | `oklch(0.245 0.065 28)` | Fundo de avatar, chave do projeto, badge, zona de soltar ativa |
+| `canvas` | `oklch(0.965 0.004 275)` | `oklch(0.16 0.008 275)` | Fundo da aplicação |
+| `canvas-deep` | `oklch(0.94 0.006 275)` | `oklch(0.13 0.008 275)` | Fim do degradê do fundo |
+| `well` | `oklch(0.935 0.006 275)` | `oklch(0.185 0.009 275)` | Zona rebaixada (coluna do board): mais escura que o fundo no claro, mais clara no escuro |
+| `surface` | `oklch(0.99 0.002 275)` | `oklch(0.19 0.009 275)` | Superfície opaca |
+| `surface-raised` | `oklch(0.935 0.006 275)` | `oklch(0.23 0.01 275)` | Hover, item ativo, opção escolhida, badge neutro |
+| `line` | `oklch(0.88 0.008 275)` | `oklch(0.28 0.01 275)` | Divisória |
+| `line-strong` | `oklch(0.6 0.012 275)` | `oklch(0.53 0.012 275)` | Borda de campo e de controle |
+| `ink` | `oklch(0.22 0.012 275)` | `oklch(0.95 0.005 275)` | Texto principal |
+| `ink-muted` | `oklch(0.42 0.014 275)` | `oklch(0.77 0.01 275)` | Texto secundário |
+| `ink-subtle` | `oklch(0.5 0.014 275)` | `oklch(0.63 0.012 275)` | Metadado, placeholder |
+| `accent` | `oklch(0.5 0.16 282)` | `oklch(0.52 0.15 282)` | Preenchimento da ação primária, traço da aba ativa |
+| `accent-hover` | `oklch(0.45 0.16 282)` | `oklch(0.56 0.15 282)` | Hover da ação primária |
+| `accent-ink` | `oklch(0.99 0.003 282)` | igual | Texto sobre `accent` |
+| `accent-text` | `oklch(0.48 0.16 282)` | `oklch(0.78 0.11 285)` | Link, anel de foco, aba e ícone ativos, borda da opção escolhida |
+| `accent-soft` | `oklch(0.93 0.03 282)` | `oklch(0.29 0.06 282)` | Fundo de avatar, chave do projeto, badge, zona de soltar ativa |
 | `danger`, `success`, `warning`, `info` | tons 0.42–0.48 | tons 0.7–0.83 | Texto e ícone de estado |
 | `*-soft` dos quatro | tons 0.93–0.94 | tons 0.27–0.29 | Fundo de badge e de aviso |
-| `type-user-story`, `type-spike`, `type-issue`, `type-tech-debt` | tons 0.55–0.58 | tons 0.7–0.8 | Marca e borda do tipo do card |
+| `type-user-story`, `type-spike`, `type-issue`, `type-tech-debt` | tons 0.55–0.62 | tons 0.7–0.8 | Marca e borda do tipo do card |
 
 Contraste conferido (razão WCAG, pior caso contra `canvas`, `canvas-deep`, `well`, `surface` e
-`surface-raised`), recalculado em 2026-10-22 com a paleta coral:
+`surface-raised`), recalculado em 2026-10-22:
 
 | Par | Claro | Escuro |
 | --- | --- | --- |
-| `ink` | 14,1:1 | 14,6:1 |
-| `ink-muted` | 7,2:1 | 8,0:1 |
-| `ink-subtle` | 5,3:1 | 5,1:1 |
-| `accent-text` | 6,9:1 | 7,9:1 |
-| `accent` (traço, gráfico) | 5,6:1 | 3,7:1 |
-| `danger`, `success`, `warning`, `info` | ≥ 5,5:1 | ≥ 6,3:1 |
-| `line-strong` | 3,1:1 | 3,4:1 |
-| cores de tipo (gráfico, não texto) | ≥ 3,4:1 | ≥ 6,3:1 |
-| `action-ink` sobre `action` / `action-hover` | 13,4:1 / 10,8:1 | 11,0:1 / 8,3:1 |
-| `accent-text` sobre `accent-soft` | 6,7:1 | 7,3:1 |
+| `ink` | 14,3:1 | 14,6:1 |
+| `ink-muted` | 7,0:1 | 8,1:1 |
+| `ink-subtle` | 5,0:1 | 4,8:1 |
+| `accent-text` | 5,7:1 | 8,2:1 |
+| `accent` (traço da aba, sobre `canvas` e `surface`, onde as abas ficam) | ≥ 5,2:1 | ≥ 3,2:1 |
+| `danger`, `success`, `warning`, `info` | ≥ 5,9:1 | ≥ 5,9:1 |
+| `line-strong` | 3,3:1 | 3,2:1 |
+| cores de tipo (gráfico, não texto) | ≥ 3,1:1 | ≥ 5,9:1 |
+| `accent-ink` sobre `accent` / `accent-hover` | 6,2:1 / 7,7:1 | 5,6:1 / 4,7:1 |
+| `accent-text` sobre `accent-soft` | 5,6:1 | 7,0:1 |
 | texto do badge sobre o `*-soft` do tom | ≥ 5,8:1 | ≥ 5,4:1 |
 
 Texto fica em 4,5:1 ou mais; borda que identifica controle e marca gráfica, em 3:1 ou mais.
 
-**Um accent:** coral — texto no link, no foco, na aba e no item ativo da navegação, a borda da
-opção escolhida e a zona de soltar ativa. A ação primária não é coral: é o `action`, neutro e
-escuro, como no Linear, para que o coral marque só o que está selecionado. Nunca como decoração.
+**Um accent:** índigo — preenchimento na ação primária, texto no link, no foco, na aba e no item
+ativo da navegação, a borda da opção escolhida e a zona de soltar ativa, como no Megabrain. Nunca
+como decoração.
 
 **Cor de estado só em badge.** O estado do card e a prioridade aparecem pelo `Badge`, com o tom
 decidido em `features/card/model/lib/card-tones.ts` (a fazer neutro, em andamento info, feito
@@ -231,8 +230,8 @@ o brilho atravessar e opaco o bastante para o texto manter o contraste das super
 
 | Onde | Valor | Motivo |
 | --- | --- | --- |
-| `public/favicon.svg` | `#fd8c7e` | O favicon não lê variável CSS; é o `accent-text` do escuro em hex. |
-| `index.html` (`theme-color`) | `#f1eded` | A meta tag não lê variável CSS; é o `canvas` do claro em hex. |
+| `public/favicon.svg` | `#b0adfb` | O favicon não lê variável CSS; é o `accent-text` do escuro em hex. |
+| `index.html` (`theme-color`) | `#f2f3f6` | A meta tag não lê variável CSS; é o `canvas` do claro em hex. |
 | `card-list-results.tsx` | `min-w-[40rem]` | Largura mínima da tabela de cards antes da rolagem horizontal. |
 | `card-details-tab.tsx` | `20rem` na grade | Largura do painel de propriedades do card. |
 | `attachment-preview-dialog.tsx` | `max-h-[70dvh]` | A imagem pré-visualizada cabe na modal sem rolar a página. |
