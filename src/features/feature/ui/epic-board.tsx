@@ -20,7 +20,7 @@ export function EpicBoard({ epics, renderEpicLink }: EpicBoardProps) {
       renderTile={epic => (
         <GroupTile
           key={epic.id}
-          kindLabel="Epic"
+          kind="epic"
           titleLink={renderEpicLink(epic)}
           progressLabel={`Progresso de ${epic.title}`}
           progress={epic.progress}

@@ -4,6 +4,7 @@ import {
   createFeature,
   deleteFeature,
   getFeature,
+  listBoardFeatures,
   listFeatures,
   setFeatureEpic,
   updateFeature,
@@ -60,6 +61,15 @@ describe("listFeatures", () => {
     vi.mocked(api.get).mockResolvedValue({ data: [{ ...summaryDto, epic_id: null }] });
 
     await expect(listFeatures("project-1")).resolves.toEqual([{ ...summary, epicId: null }]);
+  });
+});
+
+describe("listBoardFeatures", () => {
+  it("lista as features de um board pela rota do board", async () => {
+    vi.mocked(api.get).mockResolvedValue({ data: [summaryDto] });
+
+    await expect(listBoardFeatures("board-1")).resolves.toEqual([summary]);
+    expect(api.get).toHaveBeenCalledWith("/api/v1/boards/board-1/features");
   });
 });
 

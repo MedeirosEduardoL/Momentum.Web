@@ -21,7 +21,8 @@ touches:
   - src/features/feature/model/hooks/use-group-form.ts
   - src/features/feature/model/lib/hierarchy.ts
   - src/features/feature/index.ts
-  - src/features/feature/ui/project-hierarchy.tsx
+  - src/features/feature/ui/board-groups.tsx
+  - src/widgets/group-links.tsx
   - src/features/feature/ui/group-board.tsx
   - src/features/feature/ui/group-tile.tsx
   - src/features/feature/ui/feature-board.tsx
@@ -50,22 +51,25 @@ simbolos:
   - FeatureEpicInvalid
   - FeatureLimitReached
   - EpicLimitReached
-  - GroupsView
+  - BoardGroups
+  - useListBoardFeatures
+  - useListBoardEpics
   - GroupBoard
   - FeatureBoard
   - EpicBoard
   - toGroupColumns
   - GROUP_STATES
-  - toGroupsView
+  - toBoardGroupsSearch
 relacionados: [telas-de-card, telas-de-board, guard-de-rota]
 ---
 
 ## PARA_QUE_SERVE
 
-- Mostra as features e os epics de um projeto em três guias: o board de features e o de epics, em
-  colunas pelo estado derivado, e a hierarquia (epics, as features de cada um e as features sem
-  epic); e a tela de cada feature e de cada epic, com os anexos, excluir a partir das listas, e as
-  telas de criar e de editar (título e descrição) de cada um.
+- Mostra as features e os epics de um board nas visões dele (ADR 0009 do Core): o board de
+  features e o de epics, em colunas pelo estado derivado, e, como lista, a hierarquia (epics, as
+  features de cada um e as features sem epic); e a tela de cada feature e de cada epic, com os
+  anexos, excluir a partir das listas, e as telas de criar e de editar (título e descrição) de
+  cada um.
 - Entrega à feature `card` a lista de features e de epics de um projeto, para o seletor de feature
   do card, o do formulário de card novo e o filtro da lista, e à feature `board`, para os critérios
   de feature e de epic do filtro do board.
@@ -105,12 +109,15 @@ relacionados: [telas-de-card, telas-de-board, guard-de-rota]
 - Features e epics em board (pedido do usuário em 2026-10-22, passo 11.8, D-07 do Core): o board
   é a forma principal do produto, e o estado deles já é derivado em três valores. As colunas são
   fixas (a fazer, em andamento, concluída), sem filtro salvo e sem arrastar, porque o estado não se
-  muda à mão; a guia escolhida fica na URL (`?visao=`), com o board de features como padrão, sem
-  parâmetro.
+  muda à mão.
+- Visões do board (segunda rodada do mesmo dia, passo 11.12, ADR 0009 do Core): o usuário quis
+  features e epics presos ao board, com o acesso dele, como os níveis de backlog do VSTS. A tela
+  do projeto saiu; o Core devolve as features e os epics do recorte do board, e o Web não repete a
+  regra do recorte.
 - Os anexos da feature e do epic são da feature `attachment`, que esta não importa: entram por
   `renderAttachments`, entregue pela página.
 - A feature e o epic informam o próprio projeto à navegação lateral como o card: o link
-  "Voltar para features e epics" de `feature-links.tsx` (`reportingHierarchyLink`) leva junto um
+  "Voltar para o board" de `feature-links.tsx` (`reportingHierarchyLink`) leva junto um
   `ValueReporter` com o `onProjectChange` da rota (conhecimento `telas-de-card`).
 
 ## INVARIANTES
@@ -123,9 +130,9 @@ relacionados: [telas-de-card, telas-de-board, guard-de-rota]
 - INV-3: `src/features/feature` não importa de `@/features/card`; o import entre as duas é só de
   `card` para `feature`.
 - INV-4: O `index.ts` da feature exporta para outras features só queries (`useListFeatures`,
-  `useListEpics`) e tipos; as telas (`ProjectHierarchy`, `FeatureDetail`, `EpicDetail`,
-  `CreateEpicForm`, `CreateFeatureForm`, `CreateEpicFeatureForm`, `EditFeatureForm` e
-  `EditEpicForm`) são consumidas só por `src/pages/feature`.
+  `useListEpics`) e tipos; as telas (`FeatureDetail`, `EpicDetail`, `CreateEpicForm`,
+  `CreateFeatureForm`, `CreateEpicFeatureForm`, `EditFeatureForm` e `EditEpicForm`) são consumidas
+  só por `src/pages/feature`, e as visões do board (`BoardGroups`), só por `src/pages/board`.
 - INV-5: Toda consulta de feature e de epic tem `staleTime` zero
   (`DERIVED_FROM_CARDS_STALE_TIME`).
 - INV-6: Toda mutation de feature e de epic, ao terminar com sucesso ou com erro, invalida
@@ -152,10 +159,17 @@ relacionados: [telas-de-card, telas-de-board, guard-de-rota]
 - INV-14: O board de features e o de epics têm sempre as três colunas de `GROUP_STATES`, na ordem
   a fazer, em andamento e concluída, inclusive vazias, e nenhum cartão deles é arrastável nem muda
   o estado.
-- INV-15: A guia de `/projetos/$projectId/features` vem só da URL: sem `visao`, o board de
-  features; `visao=epics` e `visao=hierarquia` para as outras (`groups-search.ts`).
+- ~~INV-15~~ (removido em 2026-10-22: a tela de features e epics do projeto saiu; as visões são
+  do board, `?nivel=` e `?exibir=lista`, e `/projetos/$projectId/features?visao=` só leva a elas,
+  pelo `toBoardGroupsSearch`).
 - INV-16: `src/features/feature` não importa `@/features/attachment`: a seção "Anexos" da tela de
   feature e da de epic é o que `renderAttachments` devolve.
+- INV-17: As visões de features e de epics de um board leem só `GET
+  /api/v1/boards/{boardId}/features` e `/epics` (`useListBoardFeatures`, `useListBoardEpics`), sob
+  `featureKeys.all`, para as mutations de feature e de epic as relerem; nunca filtram as listas do
+  projeto no Web.
+- INV-18: O cartão da feature tem a borda esquerda em `type-feature` (roxo) e o do epic em
+  `type-epic` (dourado), sempre com "Feature" ou "Epic" escrito nele (`GroupTile`).
 
 ## LIMITACOES
 
@@ -170,7 +184,10 @@ relacionados: [telas-de-card, telas-de-board, guard-de-rota]
 - O progresso na tela pode estar alguns segundos atrás do Core enquanto a consulta refeita não
   volta; o que aparece primeiro é o último valor lido.
 - A tela de uma feature e a de um epic não excluem o próprio item: é preciso voltar à hierarquia.
-- A hierarquia não lista os cards de cada feature: leva à lista de cards filtrada pela feature.
+- A hierarquia não lista os cards de cada feature: leva à lista do board filtrada pela feature;
+  na tela do epic, à lista do primeiro board do projeto.
+- "Nova feature" e "Novo epic" criam no projeto: o item novo só aparece no board cujo recorte o
+  pega (num board de um epic, a feature sem epic não aparece).
 - O board de features e o de epics não filtram nem agrupam, e mostram todas as features (até 500)
   e todos os epics (até 100) do projeto.
 - Qualquer pessoa do time cria, altera e exclui: o Core não restringe, e a tela não esconde nada
@@ -198,14 +215,14 @@ relacionados: [telas-de-card, telas-de-board, guard-de-rota]
   `Feature`, `Epic` e `GroupText` (INV-2).
 - `rg -n "@/features/card" src/features/feature` não devolve nada (INV-3).
 - `npx vitest run src/features/feature/model/lib/group-board.test.ts
-  src/features/feature/ui/project-hierarchy.test.tsx src/app/routes/groups-search.test.ts` cobre
-  as colunas, as guias e a URL (INV-14, INV-15); `rg -n "@/features/attachment"
-  src/features/feature` não devolve nada (INV-16).
+  src/features/feature/ui/board-groups.test.tsx src/app/routes/groups-search.test.ts` cobre as
+  colunas, as cores, a hierarquia como lista e as rotas do board (INV-14, INV-17, INV-18);
+  `rg -n "@/features/attachment" src/features/feature` não devolve nada (INV-16).
 - `rg -n "@/features/feature" src --glob '!src/pages/feature/**' --glob '!**/*.test.*'` só devolve
   arquivos de `src/features/card` e de `src/features/board`, importando `useListFeatures`,
-  `useListEpics` e tipos (INV-4).
+  `useListEpics` e tipos, mais `src/pages/board` (`BoardGroups`) e `src/widgets` (tipos) (INV-4).
 - `rg -c "staleTime: DERIVED_FROM_CARDS_STALE_TIME" src/features/feature/api/feature.queries.ts`
-  devolve 4, uma por consulta (INV-5).
+  devolve 6, uma por consulta (INV-5).
 - Em `src/features/feature/api/feature.mutations.ts`, as sete mutations têm `onSettled`, e a de
   excluir feature chama `invalidateQueries()` sem filtro (INV-6).
 - `rg -n "ConfirmButton|removeFeature|removeEpic" src/features/feature/ui/feature-detail.tsx

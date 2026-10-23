@@ -1,6 +1,6 @@
 import type { EpicSummary } from "@/features/feature";
 import type { SelectOption } from "@/shared/ui/select-field";
-import type { Board, BoardAssigneeView } from "../types/board.types";
+import type { Board, BoardAssigneeView, BoardLevel } from "../types/board.types";
 
 export type BoardGrouping = "none" | "assignee";
 
@@ -13,6 +13,12 @@ export const UNASSIGNED_OPTION: SelectOption = { value: UNASSIGNED, label: "Sem 
 export const BOARD_GROUPING_OPTIONS: SelectOption<BoardGrouping>[] = [
   { value: "none", label: "Sem agrupar" },
   { value: "assignee", label: "Responsável" },
+];
+
+export const BOARD_LEVEL_OPTIONS: SelectOption<BoardLevel>[] = [
+  { value: "cards", label: "Cards" },
+  { value: "features", label: "Features" },
+  { value: "epics", label: "Epics" },
 ];
 
 export function toBoardOptions(boards: Board[]): SelectOption[] {

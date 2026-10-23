@@ -13,6 +13,7 @@ os formulários de criar e editar, com os campos de cada tipo. O contrato da API
 | `/projetos/$projectId/cards` | Lista de cards do projeto | A lista é de um projeto: sem ele não há o que listar. |
 | `/projetos/$projectId/cards/novo` | Formulário de criar | O card nasce num projeto e não sai dele. |
 | `/cards/$cardId` | Detalhe em página inteira | O card se acha pelo id, como em `GET /api/v1/cards/{cardId}`. Uma relação entre cards de projetos diferentes aponta para cá sem saber o projeto. Desde 2026-10-22 é o "Abrir em página inteira" da modal. |
+| `/projetos/$projectId/boards?exibir=lista` | Lista de cards do board | Desde 2026-10-22 a lista é uma visão do board (ADR 0009 do Core), lida de `GET /api/v1/boards/{boardId}/cards`; `/projetos/$projectId/cards` só redireciona para cá, com os mesmos filtros. |
 | `?card=<id>` no board e na lista | Card aberto em modal | O jeito principal de abrir um card (passo 11.6, ADR 0008 do Core): a modal fica sobre a tela, e o endereço com o card aberto se recarrega e se compartilha. |
 | `/cards/$cardId/editar` | Formulário de editar | Segue o detalhe. |
 

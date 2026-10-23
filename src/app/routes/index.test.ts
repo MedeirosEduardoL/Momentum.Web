@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { router } from "./index";
 
-const REDIRECT_ROUTE_IDS = new Set(["/member/organizacao/"]);
+const REDIRECT_ROUTE_IDS = new Set([
+  "/member/organizacao/",
+  "/member/projetos/$projectId/cards",
+  "/member/projetos/$projectId/features",
+]);
 
 function isPageRoute(route: { id: string; children?: unknown }) {
   return !route.children && !REDIRECT_ROUTE_IDS.has(route.id);

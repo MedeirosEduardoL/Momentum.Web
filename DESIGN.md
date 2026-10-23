@@ -13,7 +13,8 @@ com o inventário em `.claude/rules/shared-ui.md`.
 
 - **Ícone:** lua crescente — `Moon` do lucide-react na interface e `public/favicon.svg` no
   navegador.
-- **Versão de lançamento:** v1.0.0, "Las Noches".
+- **Versão de lançamento:** v1.0.0, "Las Noches". Durante o beta, a navegação lateral aberta mostra
+  "Versão Beta - Las Noches" em `text-xs` `ink-subtle`, acima de "Configurações do projeto".
 - **Lane:** a paleta do Megabrain — índigo frio e sóbrio (matizes 275 e 282), superfícies de
   vidro, brilho discreto no fundo escuro — com o acabamento enxuto do Linear e do YouTrack (pouca
   borda, um accent só, a interface recua), sobre o comportamento do Azure DevOps: o board como tela principal, o card aberto numa modal com guias, menu de três
@@ -26,7 +27,8 @@ com o inventário em `.claude/rules/shared-ui.md`.
   organização › projeto, o tema, a pessoa e "Sair". No celular, com projeto no caminho, a
   organização sai do caminho.
 - **Navegação lateral** (`app/layouts/side-nav.tsx`), presa à borda: Projetos; o projeto atual com
-  Boards, Features e epics e Lista de cards, nessa ordem, porque o board é a tela principal; no pé, Configurações do projeto e Organização. Recolhida, mostra
+  Boards, o único hub, porque a lista de cards, as features e os epics são visões do board (ADR
+  0009 do Core); no pé, o selo da versão, Configurações do projeto e Organização. Recolhida, mostra
   só os ícones; abaixo de `lg`, fica sempre recolhida. O projeto atual vem da rota ou, nas telas de
   card, feature e epic, do que a tela informa (`ValueReporter`). Os ícones e a chave do projeto
   ficam numa coluna de 32 px centrada em 24 px da borda, a mesma do botão de recolher da barra
@@ -67,9 +69,15 @@ com o inventário em `.claude/rules/shared-ui.md`.
   coluna, como o "New item" do Azure DevOps; o menu de três pontos da barra do board leva a editar
   o board, editar as colunas, o acesso ao board e excluir, e o selo "Acesso restrito" aparece ao
   lado dele quando o board é só das pessoas escolhidas.
+- **Visões do board:** na barra do board, "Visão" (Cards, Features, Epics), com a marca `Layers` na
+  cor da visão (accent, roxo ou dourado), e o botão "Ver como lista"/"Ver como board", como os
+  níveis de backlog e o "View as backlog" do Azure DevOps. Responsável e "Agrupar por" só aparecem
+  na visão de cards (o agrupamento só nas colunas). A lista de cards é a tabela da lista, com os
+  filtros dela embaixo da barra; a lista de features e de epics é a hierarquia.
 - **Board de features e de epics:** o mesmo desenho de colunas (`BoardColumn`), uma por estado
-  derivado (a fazer, em andamento, concluída), com cartões de vidro que trazem o título, a barra de
-  progresso e a contagem de cards; sem arrastar, porque o estado é derivado.
+  derivado (a fazer, em andamento, concluída), com cartões de vidro com a borda esquerda roxa
+  (feature) ou dourada (epic), o tipo, o título, a barra de progresso e a contagem de cards; sem
+  arrastar, porque o estado é derivado.
 - **Anexos:** zona de soltar com o botão "Escolher arquivos" (`FileDropZone`), barra de progresso
   durante o envio e a lista com nome, tamanho, quem enviou e as ações Visualizar (só imagem),
   Baixar e Excluir.
@@ -111,6 +119,8 @@ não existe. Neutros frios, puxados para o índigo (matiz 275), com os mesmos va
 | `danger`, `success`, `warning`, `info` | tons 0.42–0.48 | tons 0.7–0.83 | Texto e ícone de estado |
 | `*-soft` dos quatro | tons 0.93–0.94 | tons 0.27–0.29 | Fundo de badge e de aviso |
 | `type-user-story`, `type-spike`, `type-issue`, `type-tech-debt` | tons 0.55–0.62 | tons 0.7–0.8 | Marca e borda do tipo do card |
+| `type-feature` | `oklch(0.52 0.19 300)` | `oklch(0.72 0.15 300)` | Roxo: borda do cartão de feature e marca da visão |
+| `type-epic` | `oklch(0.6 0.13 88)` | `oklch(0.82 0.15 88)` | Dourado: borda do cartão de epic e marca da visão |
 
 Contraste conferido (razão WCAG, pior caso contra `canvas`, `canvas-deep`, `well`, `surface` e
 `surface-raised`), recalculado em 2026-10-22:
@@ -125,6 +135,7 @@ Contraste conferido (razão WCAG, pior caso contra `canvas`, `canvas-deep`, `wel
 | `danger`, `success`, `warning`, `info` | ≥ 5,9:1 | ≥ 5,9:1 |
 | `line-strong` | 3,3:1 | 3,2:1 |
 | cores de tipo (gráfico, não texto) | ≥ 3,1:1 | ≥ 5,9:1 |
+| `type-feature` / `type-epic` (gráfico) | 5,0:1 / 3,3:1 | 6,5:1 / 9,6:1 |
 | `accent-ink` sobre `accent` / `accent-hover` | 6,2:1 / 7,7:1 | 5,6:1 / 4,7:1 |
 | `accent-text` sobre `accent-soft` | 5,6:1 | 7,0:1 |
 | texto do badge sobre o `*-soft` do tom | ≥ 5,8:1 | ≥ 5,4:1 |
@@ -141,7 +152,9 @@ success, cancelado neutro; prioridade alta warning, urgente danger). A exceção
 cabeçalho da coluna do board, no mesmo tom da categoria do estado (`line-strong` no neutro), sempre
 com o nome do estado embaixo, e o botão de impedimentos do cartão do board, em `danger-soft`
 enquanto há impedimento em aberto, sempre com a palavra "Impedimentos" e a contagem. A cor do tipo só aparece na
-marca (`CardTypeMark`) e na borda do card no board, sempre com o nome do tipo por perto.
+marca (`CardTypeMark`) e na borda do card no board, sempre com o nome do tipo por perto; o roxo da
+feature e o dourado do epic, só na borda do cartão deles e na marca da visão, com "Feature",
+"Epic" ou o nome da visão por perto.
 
 ## Vidro
 
@@ -235,6 +248,6 @@ o brilho atravessar e opaco o bastante para o texto manter o contraste das super
 | `card-list-results.tsx` | `min-w-[40rem]` | Largura mínima da tabela de cards antes da rolagem horizontal. |
 | `card-details-tab.tsx` | `20rem` na grade | Largura do painel de propriedades do card. |
 | `attachment-preview-dialog.tsx` | `max-h-[70dvh]` | A imagem pré-visualizada cabe na modal sem rolar a página. |
-| `card-type-mark.tsx`, `card-tile.tsx` | `w-[3px]`, `border-l-[3px]` | Espessura da marca do tipo, a do Azure DevOps. |
+| `card-type-mark.tsx`, `card-tile.tsx`, `group-tile.tsx` | `w-[3px]`, `border-l-[3px]` | Espessura da marca do tipo, a do Azure DevOps. |
 | `screen.tsx`, `organization-settings-layout.tsx` | `tracking-[-0.01em]` | Aperto do título da tela em `text-2xl`. |
 | `side-nav.tsx` | `h-[calc(100dvh-3rem)]` | Altura da navegação lateral abaixo da barra superior de 3rem. |

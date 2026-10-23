@@ -1,7 +1,7 @@
 export { CardDetail } from "./ui/card-detail";
 export { CardDialog } from "./ui/card-dialog";
 export { CardExtensionsProvider } from "./model/contexts/card-extensions-provider";
-export { CardList } from "./ui/card-list";
+export { BoardCardList } from "./ui/board-card-list";
 export { CardStateColumns } from "./ui/card-state-columns";
 export { CardStateSettings } from "./ui/card-state-settings";
 export { CreateCardForm } from "./ui/create-card-form";

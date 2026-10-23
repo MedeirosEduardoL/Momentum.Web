@@ -39,6 +39,8 @@ touches:
   - src/pages/board/project-board/index.tsx
   - src/app/routes/board.routes.tsx
   - src/app/routes/board-search.ts
+  - src/shared/ui/use-outside-press.ts
+  - src/features/card/ui/board-card-list.tsx
 simbolos:
   - ProjectBoard
   - CardStateColumns
@@ -88,6 +90,12 @@ simbolos:
   - BoardMemberOutsideProject
   - OpenedCardDialog
   - useRefreshBoardColumns
+  - useOutsidePress
+  - BoardLevel
+  - BoardGroupsView
+  - BoardCardList
+  - renderCardList
+  - renderGroups
 relacionados: [telas-de-card, telas-de-feature-e-epic, administracao-da-organizacao, guard-de-rota, carga-inicial]
 ---
 
@@ -107,6 +115,8 @@ relacionados: [telas-de-card, telas-de-feature-e-epic, administracao-da-organiza
   e o menu de três pontos do cartão cria task, bug ou impedimento sem sair dele.
 - Deixa o administrador do projeto escolher quem vê o board (todo o time ou só as pessoas
   escolhidas) e conferir, dar e tirar o acesso, pelo menu de três pontos do board.
+- Mostra o board em quatro visões (ADR 0009 do Core): as colunas, a lista de cards, as features e
+  os epics, escolhidas na barra ("Visão" e "Ver como lista"/"Ver como board").
 
 ## POR_QUE_EXISTE
 
@@ -181,6 +191,15 @@ relacionados: [telas-de-card, telas-de-feature-e-epic, administracao-da-organiza
   do board a cada card aberto era o que o usuário chamou de "bagunçado", e o endereço com o card
   aberto se recarrega e se compartilha. Fechar relê as colunas, porque a modal pode ter mudado o
   card.
+- As visões (passo 11.12, ADR 0009 do Core) ficam no board para ficar no recorte e no acesso
+  dele, como os níveis de backlog do VSTS. A feature `board` só escolhe a visão e entrega o board a
+  quem desenha (`renderCardList`, `renderGroups`, como já fazia com `renderColumns`): a lista é da
+  feature `card` e as features e os epics, da feature `feature`, cada uma lendo a rota do board que
+  devolve os seus itens.
+- Clicar fora do cartão com a lista de subitens aberta desiste (passo 11.11): a lista e o campo
+  somem sem gravar, como o "Add task" do VSTS. Clique em outra camada por cima (o subitem aberto num
+  diálogo, o menu flutuante, um toast) não é "fora": senão abrir o subitem fecharia a lista que o
+  mostra.
 - O acesso ao board (passo 11.9, ADR 0007 do Core) esconde o recorte e não os cards. A tela diz
   isso no próprio diálogo, para ninguém usar o board restrito como sigilo.
 - Mesmo assim o card pode não casar com o filtro (o epic salvo, ou a escolha de outro tipo no
@@ -284,13 +303,23 @@ relacionados: [telas-de-card, telas-de-feature-e-epic, administracao-da-organiza
   "Tirar"); "Dar acesso a" só oferece quem é do time, não administra e ainda não foi escolhido.
 - INV-35: O selo "Acesso restrito" aparece na barra do board quando a `visibility` dele é
   `members`, para todo mundo que vê o board.
+- INV-36: A visão vem só da URL: `nivel` (`features`, `epics`; sem ele, cards) e `exibir=lista`
+  (sem ele, board), validados por `toBoardSearch`; os filtros da lista (`tipo`, `estado`,
+  `feature`, `arquivados`, `pagina`) também, e `responsavel` vale para as colunas e para a lista.
+- INV-37: Responsável e "Agrupar por" só aparecem na visão de cards, e "Agrupar por" só nas
+  colunas; a lista não repete o seletor de responsável da barra (`isAssigneeHidden`).
+- INV-38: Com a lista de subitens aberta, um `pointerdown` fora do cartão e na mesma camada da
+  página fecha a lista e o campo (`useOutsidePress` com `ignoresOverlays`); dentro do cartão ou
+  numa camada por cima, não.
+- INV-39: `/projetos/$projectId/cards` e `/projetos/$projectId/features` só redirecionam (`replace`)
+  para as visões do board, levando os filtros da lista ou a visão antiga.
 
 ## LIMITACOES
 
 - O cartão só mostra botão para o tipo de subitem que o card tem; o primeiro de um tipo se cria
   pelo menu de três pontos do cartão (INV-32).
-- O board restrito não esconde os cards: quem não o vê acha os mesmos cards na lista de cards e
-  em outro board (ADR 0007 do Core).
+- O board restrito não esconde os cards: quem não o vê acha os mesmos cards em outro board e
+  pelo endereço do card (ADR 0007 do Core).
 - Quem perde o acesso a um board continua vendo-o até a lista de boards ser relida; aí o Core
   responde 404, e a tela abre o primeiro board que a pessoa vê, com o aviso de board inexistente.
 - A lista de quem vê o board não mostra o administrador da organização que não está no time,
@@ -298,7 +327,8 @@ relacionados: [telas-de-card, telas-de-feature-e-epic, administracao-da-organiza
 - Abrir os subitens de um card lê a lista dele toda (`GET /api/v1/cards/{cardId}/tasks`), e o
   cartão filtra o tipo; um card com muitos subitens lê todos para mostrar um tipo.
 - Coluna com mais de 100 cards mostra só os 100 mais novos, porque o Core não pagina a coluna. O
-  link do aviso leva à lista de cards filtrada pelo estado, que não aplica o filtro do board.
+  link do aviso leva à lista do mesmo board, filtrada pelo estado, que pagina.
+- Projeto sem board não mostra cards em lista nenhuma: a lista é uma visão do board.
 - Com coluna cortada, as raias por responsável e a contagem de cada raia só consideram os cards
   que vieram.
 - O card movido aparece no topo da coluna nova até as colunas voltarem; depois vai para a posição
@@ -355,7 +385,9 @@ relacionados: [telas-de-card, telas-de-feature-e-epic, administracao-da-organiza
   ao abrir, a releitura das colunas, o cartão parado com a lista aberta e o menu de três pontos
   (INV-27 a INV-29, INV-32).
 - `npx vitest run src/features/board/ui/project-board.test.tsx` cobre o item "Acesso ao board", o
-  diálogo e o selo (INV-9, INV-34, INV-35); `rg -n "OpenedCardDialog|refreshColumns"
+  diálogo e o selo e a troca de visão (INV-9, INV-34 a INV-37); `card-tile.test.tsx`, o clique
+  fora (INV-38); `src/app/routes/board-search.test.ts`, `groups-search.test.ts` e
+  `index.test.ts`, a URL e os redirecionamentos (INV-36, INV-39); `rg -n "OpenedCardDialog|refreshColumns"
   src/pages/board/project-board/index.tsx` mostra a modal e a releitura ao fechar (INV-33).
 - `npx vitest run src/features/board src/app/stores src/app/routes/home.routes.test.tsx
   src/features/card/model/hooks/use-move-card.test.ts

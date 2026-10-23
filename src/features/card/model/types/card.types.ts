@@ -107,10 +107,8 @@ export type CardListFilters = {
 
 export type CardAssigneeFilter = Pick<CardListFilters, "assigneeId" | "isUnassigned">;
 
-export type CardListQuery = CardListFilters & {
-  projectId: string;
-  search?: string;
-};
+export type CardListQuery = CardListFilters &
+  ({ projectId: string; search?: string } | { boardId: string });
 
 export type CardPage = {
   cards: CardSummary[];

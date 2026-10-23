@@ -54,20 +54,23 @@ const onSubitemsChanged = vi.fn();
 
 function renderTile() {
   render(
-    <ul>
-      <CardTile
-        card={card}
-        titleLink={<a href="/cards/card-1">{card.title}</a>}
-        stateOptions={[{ value: fresh.id, label: fresh.name }]}
-        assigneeOptions={[{ value: "", label: "Sem responsável" }]}
-        isLocked={false}
-        isDragged={false}
-        onDragStart={vi.fn()}
-        onDragEnd={vi.fn()}
-        onMove={vi.fn()}
-        onSubitemsChanged={onSubitemsChanged}
-      />
-    </ul>,
+    <>
+      <ul>
+        <CardTile
+          card={card}
+          titleLink={<a href="/cards/card-1">{card.title}</a>}
+          stateOptions={[{ value: fresh.id, label: fresh.name }]}
+          assigneeOptions={[{ value: "", label: "Sem responsável" }]}
+          isLocked={false}
+          isDragged={false}
+          onDragStart={vi.fn()}
+          onDragEnd={vi.fn()}
+          onMove={vi.fn()}
+          onSubitemsChanged={onSubitemsChanged}
+        />
+      </ul>
+      <button type="button">Fora do cartão</button>
+    </>,
     { wrapper: createQueryWrapper().wrapper }
   );
 
@@ -205,5 +208,31 @@ describe("CardTile — menu de três pontos", () => {
       kind: "bug",
       title: "Botão some no celular",
     });
+  });
+
+  it("desiste do subitem ao clicar fora do cartão, sem criar nada", async () => {
+    const user = renderTile();
+
+    await user.click(screen.getByRole("button", { name: "Ações de MOM-12" }));
+    await user.click(screen.getByRole("menuitem", { name: "Adicionar bug" }));
+    await user.type(await screen.findByRole("textbox", { name: "Novo bug em MOM-12" }), "Rascunho");
+    await user.click(screen.getByRole("button", { name: "Fora do cartão" }));
+
+    expect(screen.queryByRole("textbox", { name: "Novo bug em MOM-12" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("group", { name: "Bugs de MOM-12" })).not.toBeInTheDocument();
+    expect(createCardTask).not.toHaveBeenCalled();
+  });
+
+  it("mantém a lista aberta enquanto se usa o subitem aberto num diálogo", async () => {
+    const user = renderTile();
+
+    await user.click(screen.getByRole("button", { name: /^Tasks de MOM-12/ }));
+    await user.click(await screen.findByRole("button", { name: "Mapear os campos" }));
+    const dialog = await screen.findByRole("dialog");
+    await user.click(within(dialog).getByText("Task de MOM-12"));
+    await user.keyboard("{Escape}");
+
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(screen.getByRole("group", { name: "Tasks de MOM-12" })).toBeInTheDocument();
   });
 });

@@ -25,32 +25,14 @@ export function ProjectListPage({ firstBoardProject, onFirstBoardFinished }: Pro
           </TextLink>
         )}
         renderAction={project => (
-          <>
-            <TextLink
-              to="/projetos/$projectId/boards"
-              params={{ projectId: project.id }}
-              className="text-sm"
-              aria-label={`Boards de ${project.name}`}
-            >
-              Boards
-            </TextLink>
-            <TextLink
-              to="/projetos/$projectId/features"
-              params={{ projectId: project.id }}
-              className="text-sm"
-              aria-label={`Features e epics de ${project.name}`}
-            >
-              Features e epics
-            </TextLink>
-            <TextLink
-              to="/projetos/$projectId/cards"
-              params={{ projectId: project.id }}
-              className="text-sm"
-              aria-label={`Lista de cards de ${project.name}`}
-            >
-              Lista de cards
-            </TextLink>
-          </>
+          <TextLink
+            to="/projetos/$projectId/boards"
+            params={{ projectId: project.id }}
+            className="text-sm"
+            aria-label={`Boards de ${project.name}`}
+          >
+            Boards
+          </TextLink>
         )}
       />
       {firstBoardProject && (

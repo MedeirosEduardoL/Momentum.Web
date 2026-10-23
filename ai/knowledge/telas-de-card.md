@@ -175,9 +175,12 @@ relacionados: [guard-de-rota, telas-de-feature-e-epic, telas-de-board, entrevist
   versão esperada. Nenhum botão grava por cima.
 - INV-7: Toda mutation de card, de task e de relação, ao terminar com sucesso ou com erro, invalida
   `cardKeys.all` (detalhe, listas, estados, tasks e relações).
-- INV-8: Os filtros e a página da lista de cards vivem só na URL (`tipo`, `estado`, `responsavel`,
-  `feature`, `arquivados`, `pagina`), validados por `toCardListSearch`; valor desconhecido é
-  descartado. `responsavel=nenhum` é o filtro "Sem responsável" (`unassigned=true` no Core).
+- INV-8: Os filtros e a página da lista de cards vivem só na URL do board (`tipo`, `estado`,
+  `responsavel`, `feature`, `arquivados`, `pagina`), validados por `toCardListSearch`; valor
+  desconhecido é descartado. `responsavel=nenhum` é o filtro "Sem responsável" (`unassigned=true`
+  no Core). A lista é uma visão do board (`BoardCardList`, `GET /api/v1/boards/{boardId}/cards`),
+  e a lista do projeto não existe mais (ADR 0009 do Core); a busca de relação continua lendo
+  `GET /api/v1/cards` pelo projeto.
 - INV-9: `src/app` só importa tipos de `@/features/card`.
 - INV-10: A feature de um card existente só muda por `PUT` e `DELETE
   /api/v1/cards/{cardId}/feature` (`setCardFeature`); nunca vai no `PATCH`. Na criação, a

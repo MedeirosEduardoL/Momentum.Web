@@ -8,6 +8,7 @@ type CardListFilterBarProps = {
   projectId: string;
   options: CardOptions;
   filters: CardListFilters;
+  isAssigneeHidden?: boolean;
   onFiltersChange: (filters: CardListFilters) => void;
 };
 
@@ -30,6 +31,7 @@ export function CardListFilterBar({
   projectId,
   options,
   filters,
+  isAssigneeHidden = false,
   onFiltersChange,
 }: CardListFilterBarProps) {
   const refine = (refinement: CardListRefinement) =>
@@ -51,19 +53,21 @@ export function CardListFilterBar({
         value={filters.stateId ?? ANY}
         onValueChange={stateId => refine({ stateId: stateId || undefined })}
       />
-      <SelectField
-        isLabelInline
-        label="Responsável"
-        options={[ANY_OPTION, WITHOUT_ASSIGNEE_OPTION, ...toAssigneeOptions(options.team)]}
-        value={filters.isUnassigned ? WITHOUT_ASSIGNEE : (filters.assigneeId ?? ANY)}
-        onValueChange={choice =>
-          refine(
-            choice === WITHOUT_ASSIGNEE
-              ? { assigneeId: undefined, isUnassigned: true }
-              : { assigneeId: choice || undefined, isUnassigned: undefined }
-          )
-        }
-      />
+      {!isAssigneeHidden && (
+        <SelectField
+          isLabelInline
+          label="Responsável"
+          options={[ANY_OPTION, WITHOUT_ASSIGNEE_OPTION, ...toAssigneeOptions(options.team)]}
+          value={filters.isUnassigned ? WITHOUT_ASSIGNEE : (filters.assigneeId ?? ANY)}
+          onValueChange={choice =>
+            refine(
+              choice === WITHOUT_ASSIGNEE
+                ? { assigneeId: undefined, isUnassigned: true }
+                : { assigneeId: choice || undefined, isUnassigned: undefined }
+            )
+          }
+        />
+      )}
       <CardFeatureFilter
         projectId={projectId}
         featureId={filters.featureId}

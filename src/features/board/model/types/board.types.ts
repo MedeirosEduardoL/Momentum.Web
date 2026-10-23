@@ -42,11 +42,23 @@ export type BoardUpdate = BoardDefinition & {
   boardId: string;
 };
 
+export type BoardLevel = "cards" | "features" | "epics";
+
+export type BoardGroupLevel = Exclude<BoardLevel, "cards">;
+
 export type BoardView = {
   boardId?: string;
+  level: BoardLevel;
+  isList: boolean;
   assigneeId?: string;
   isUnassigned?: boolean;
   isGroupedByAssignee: boolean;
+};
+
+export type BoardGroupsView = {
+  board: Board;
+  level: BoardGroupLevel;
+  isList: boolean;
 };
 
 export type BoardAssigneeView = Pick<BoardView, "assigneeId" | "isUnassigned">;

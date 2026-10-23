@@ -10,6 +10,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/shared/lib/cn";
+import { useOutsidePress } from "./use-outside-press";
 
 export type ActionMenuItem = {
   label: string;
@@ -51,6 +52,12 @@ export function ActionMenu({ label, items }: ActionMenuProps) {
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const isOpen = placement !== null;
 
+  useOutsidePress({
+    isActive: isOpen,
+    refs: [containerRef, menuRef],
+    onOutsidePress: () => setPlacement(null),
+  });
+
   useEffect(() => {
     if (!isOpen) {
       return;
@@ -64,24 +71,16 @@ export function ActionMenu({ label, items }: ActionMenuProps) {
       );
     }
 
-    function closeOnOutsidePress(event: PointerEvent) {
-      if (!isInside(event.target)) {
-        setPlacement(null);
-      }
-    }
-
     function closeOnMove(event: Event) {
       if (!isInside(event.target)) {
         setPlacement(null);
       }
     }
 
-    document.addEventListener("pointerdown", closeOnOutsidePress);
     window.addEventListener("scroll", closeOnMove, true);
     window.addEventListener("resize", closeOnMove);
 
     return () => {
-      document.removeEventListener("pointerdown", closeOnOutsidePress);
       window.removeEventListener("scroll", closeOnMove, true);
       window.removeEventListener("resize", closeOnMove);
     };

@@ -1,18 +1,14 @@
 import {
   createRoute,
   lazyRouteComponent,
-  useNavigate,
+  Navigate,
   useParams,
   useSearch,
   type AnyRoute,
 } from "@tanstack/react-router";
 import { useProjectContextStore } from "@/app/stores/project-context.store";
-import { fromGroupsView, toGroupsSearch, toGroupsView } from "./groups-search";
+import { toBoardGroupsSearch, toGroupsSearch } from "./groups-search";
 import { withPagePreload } from "./with-page-preload";
-
-const ProjectHierarchyPage = lazyRouteComponent(() =>
-  import("@/pages/feature").then(module => ({ default: module.ProjectHierarchyPage }))
-);
 
 const NewFeaturePage = lazyRouteComponent(() =>
   import("@/pages/feature").then(module => ({ default: module.NewFeaturePage }))
@@ -42,22 +38,16 @@ const NewEpicFeaturePage = lazyRouteComponent(() =>
   import("@/pages/feature").then(module => ({ default: module.NewEpicFeaturePage }))
 );
 
-function ProjectHierarchyRoute() {
+function GroupsRedirect() {
   const { projectId } = useParams({ from: "/member/projetos/$projectId/features" });
   const search = useSearch({ from: "/member/projetos/$projectId/features" });
-  const navigate = useNavigate();
 
   return (
-    <ProjectHierarchyPage
-      projectId={projectId}
-      view={toGroupsView(search)}
-      onViewChange={view =>
-        navigate({
-          to: "/projetos/$projectId/features",
-          params: { projectId },
-          search: fromGroupsView(view),
-        })
-      }
+    <Navigate
+      to="/projetos/$projectId/boards"
+      params={{ projectId }}
+      search={toBoardGroupsSearch(search)}
+      replace
     />
   );
 }
@@ -111,7 +101,7 @@ export function createFeatureRoutes<TMemberRoute extends AnyRoute>(memberRoute: 
     getParentRoute: () => memberRoute,
     path: "/projetos/$projectId/features",
     validateSearch: toGroupsSearch,
-    component: withPagePreload(ProjectHierarchyRoute, ProjectHierarchyPage),
+    component: GroupsRedirect,
   });
 
   const newFeatureRoute = createRoute({

@@ -2,7 +2,8 @@ import { Pencil } from "lucide-react";
 import { AttachmentPanel } from "@/features/attachment";
 import { FeatureDetail } from "@/features/feature";
 import { ButtonLink } from "@/shared/ui/button-link";
-import { renderFeatureCardsLink, reportingHierarchyLink } from "../feature-links";
+import { renderFeatureCardsLink } from "@/widgets/group-links";
+import { reportingHierarchyLink } from "../feature-links";
 
 type FeatureDetailPageProps = {
   featureId: string;

@@ -1,4 +1,4 @@
-import { Building2, FolderKanban, Layers, ListChecks, Settings, SquareKanban } from "lucide-react";
+import { Building2, FolderKanban, Settings, SquareKanban } from "lucide-react";
 import { ProjectIdentity } from "@/features/project";
 import { cn } from "@/shared/lib/cn";
 import { SideNavLink } from "@/shared/ui/side-nav-link";
@@ -32,25 +32,17 @@ export function SideNav({ projectId, isCollapsed }: SideNavProps) {
             <SquareKanban aria-hidden />
             <span>Boards</span>
           </SideNavLink>
-          <SideNavLink
-            to="/projetos/$projectId/features"
-            params={{ projectId }}
-            title="Features e epics"
-          >
-            <Layers aria-hidden />
-            <span>Features e epics</span>
-          </SideNavLink>
-          <SideNavLink
-            to="/projetos/$projectId/cards"
-            params={{ projectId }}
-            title="Lista de cards"
-          >
-            <ListChecks aria-hidden />
-            <span>Lista de cards</span>
-          </SideNavLink>
         </nav>
       )}
       <nav aria-label="Configurações" className="mt-auto flex flex-col gap-0.5">
+        <p
+          className={cn(
+            "px-2 pb-1 text-xs whitespace-nowrap text-ink-subtle",
+            isCollapsed ? "hidden" : "hidden lg:block"
+          )}
+        >
+          Versão Beta - Las Noches
+        </p>
         {projectId && (
           <SideNavLink
             to="/organizacao/projetos/$projectId/time"

@@ -8,7 +8,7 @@ import { QueryContent } from "@/shared/ui/query-content";
 import { Screen } from "@/shared/ui/screen";
 import { useListBoards } from "../api/board.queries";
 import { isMissingBoard, selectBoard } from "../model/lib/board-selection";
-import type { Board, BoardColumns, BoardView } from "../model/types/board.types";
+import type { Board, BoardColumns, BoardGroupsView, BoardView } from "../model/types/board.types";
 import { BoardFilterOptionsContent } from "./board-filter-options-content";
 import { CreateBoardForm } from "./create-board-form";
 import { EmptyBoardList } from "./empty-board-list";
@@ -17,8 +17,9 @@ import { SelectedBoard } from "./selected-board";
 type BoardScreenLinks = {
   view: BoardView;
   onViewChange: (view: BoardView) => void;
-  cardsLink: ReactNode;
   renderColumns: (columns: BoardColumns) => ReactNode;
+  renderCardList: (board: Board) => ReactNode;
+  renderGroups: (groups: BoardGroupsView) => ReactNode;
   renderColumnsEditor: (project: Project) => ReactNode;
 };
 
@@ -37,8 +38,9 @@ function BoardScreen({
   project,
   view,
   onViewChange,
-  cardsLink,
   renderColumns,
+  renderCardList,
+  renderGroups,
   renderColumnsEditor,
 }: BoardScreenProps) {
   const boards = useListBoards(project.id);
@@ -86,15 +88,13 @@ function BoardScreen({
                 canAdminister={canAdminister}
                 onRemoving={removed => setRemovedBoardId(removed.id)}
                 renderColumns={renderColumns}
+                renderCardList={renderCardList}
+                renderGroups={renderGroups}
                 columnsEditor={renderColumnsEditor(project)}
               />
             </>
           ) : (
-            <EmptyBoardList
-              canAdminister={canAdminister}
-              cardsLink={cardsLink}
-              onCreate={() => setIsCreating(true)}
-            />
+            <EmptyBoardList canAdminister={canAdminister} onCreate={() => setIsCreating(true)} />
           )
         }
       </QueryContent>

@@ -125,7 +125,7 @@ function simulateCore({ role = "administrator", boards = [], columns = columnsDt
   );
 }
 
-const DEFAULT_VIEW: BoardView = { isGroupedByAssignee: false };
+const DEFAULT_VIEW: BoardView = { level: "cards", isList: false, isGroupedByAssignee: false };
 const MISSING_BOARD_NOTICE =
   "O board deste endereço não existe mais: a tela mostra o primeiro board do projeto.";
 const onViewChange = vi.fn<(view: BoardView) => void>();
@@ -139,7 +139,6 @@ function renderBoard(scenario: Scenario, view = DEFAULT_VIEW, projectId = "proje
       projectId={projectId}
       view={view}
       onViewChange={onViewChange}
-      cardsLink={<a href="/projetos/project-1/cards">Abrir a lista de cards</a>}
       renderColumnsEditor={project => <p>Estados de {project.name} para editar</p>}
       renderColumns={({ columns, savedFilter, reload }) => (
         <>
@@ -159,6 +158,12 @@ function renderBoard(scenario: Scenario, view = DEFAULT_VIEW, projectId = "proje
           <p>Responsáveis salvos: {savedFilter.assigneeIds.join(", ") || "nenhum"}</p>
           <p>Tipos salvos: {savedFilter.cardTypes.join(", ") || "nenhum"}</p>
         </>
+      )}
+      renderCardList={board => <p>Lista de cards de {board.name}</p>}
+      renderGroups={({ board, level, isList }) => (
+        <p>
+          {isList ? "Lista" : "Board"} de {level} de {board.name}
+        </p>
       )}
     />,
     { wrapper: createQueryWrapper().wrapper }
@@ -209,7 +214,7 @@ describe("ProjectBoard — projeto sem board", () => {
     expect(
       await screen.findByText(/Só o administrador do projeto cria boards: peça a ele o primeiro/)
     ).toBeVisible();
-    expect(screen.getByRole("link", { name: "Abrir a lista de cards" })).toBeVisible();
+    expect(screen.queryByRole("link", { name: "Abrir a lista de cards" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Criar o primeiro board" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Novo board" })).toBeNull();
   });
@@ -238,7 +243,7 @@ describe("ProjectBoard — board escolhido", () => {
   it("mostra o board e o responsável pedidos na URL", async () => {
     renderBoard(
       { boards: [allCardsDto, issuesDto] },
-      { boardId: "board-2", assigneeId: "user-2", isGroupedByAssignee: true }
+      { ...DEFAULT_VIEW, boardId: "board-2", assigneeId: "user-2", isGroupedByAssignee: true }
     );
 
     expect(await screen.findByRole("combobox", { name: "Board" })).toHaveValue("board-2");
@@ -307,6 +312,7 @@ describe("ProjectBoard — board escolhido", () => {
     );
 
     expect(onViewChange).toHaveBeenCalledWith({
+      ...DEFAULT_VIEW,
       assigneeId: undefined,
       isUnassigned: true,
       isGroupedByAssignee: false,
@@ -316,7 +322,7 @@ describe("ProjectBoard — board escolhido", () => {
   it("mostra só os cards sem responsável quando a URL pede", async () => {
     renderBoard(
       { boards: [allCardsDto], columns: emptyColumnsDto },
-      { isUnassigned: true, isGroupedByAssignee: false }
+      { ...DEFAULT_VIEW, isUnassigned: true, isGroupedByAssignee: false }
     );
 
     expect(
@@ -331,13 +337,14 @@ describe("ProjectBoard — board escolhido", () => {
   it("troca sem responsável por uma pessoa sem misturar os dois", async () => {
     const user = renderBoard(
       { boards: [allCardsDto] },
-      { isUnassigned: true, isGroupedByAssignee: false }
+      { ...DEFAULT_VIEW, isUnassigned: true, isGroupedByAssignee: false }
     );
     await screen.findByRole("option", { name: "Bruno Lima" });
 
     await user.selectOptions(screen.getByRole("combobox", { name: "Responsável" }), "Bruno Lima");
 
     expect(onViewChange).toHaveBeenCalledWith({
+      ...DEFAULT_VIEW,
       assigneeId: "user-2",
       isUnassigned: undefined,
       isGroupedByAssignee: false,
@@ -353,22 +360,55 @@ describe("ProjectBoard — board escolhido", () => {
     await user.selectOptions(screen.getByRole("combobox", { name: "Agrupar por" }), "Responsável");
 
     expect(onViewChange.mock.calls).toEqual([
-      [{ boardId: "board-2", isGroupedByAssignee: false }],
-      [{ assigneeId: "user-2", isGroupedByAssignee: false }],
-      [{ isGroupedByAssignee: true }],
+      [{ ...DEFAULT_VIEW, boardId: "board-2", isGroupedByAssignee: false }],
+      [{ ...DEFAULT_VIEW, assigneeId: "user-2", isGroupedByAssignee: false }],
+      [{ ...DEFAULT_VIEW, isGroupedByAssignee: true }],
     ]);
+  });
+
+  it("troca a visão do board entre cards, features e epics, e entre board e lista", async () => {
+    const user = renderBoard({ boards: [allCardsDto] });
+    await screen.findByRole("list", { name: "Colunas" });
+
+    await user.selectOptions(screen.getByRole("combobox", { name: "Visão" }), "Features");
+    await user.click(screen.getByRole("button", { name: "Ver como lista" }));
+
+    expect(onViewChange.mock.calls).toEqual([
+      [{ ...DEFAULT_VIEW, level: "features" }],
+      [{ ...DEFAULT_VIEW, isList: true }],
+    ]);
+  });
+
+  it("mostra a lista de cards do board, sem o agrupamento das colunas", async () => {
+    renderBoard({ boards: [allCardsDto] }, { ...DEFAULT_VIEW, isList: true });
+
+    expect(await screen.findByText("Lista de cards de Todos os cards")).toBeVisible();
+    expect(screen.getByRole("combobox", { name: "Responsável" })).toBeVisible();
+    expect(screen.queryByRole("combobox", { name: "Agrupar por" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Ver como board" })).toBeVisible();
+    expect(columnsRequests()).toEqual([]);
+  });
+
+  it("mostra as features e os epics do board escolhido, sem os filtros de cards", async () => {
+    renderBoard({ boards: [allCardsDto] }, { ...DEFAULT_VIEW, level: "epics" });
+
+    expect(await screen.findByText("Board de epics de Todos os cards")).toBeVisible();
+    expect(screen.queryByRole("combobox", { name: "Responsável" })).toBeNull();
+    expect(screen.getByRole("combobox", { name: "Visão" })).toHaveValue("epics");
+    expect(columnsRequests()).toEqual([]);
   });
 
   it("volta a todos os responsáveis", async () => {
     const user = renderBoard(
       { boards: [allCardsDto] },
-      { assigneeId: "user-2", isGroupedByAssignee: false }
+      { ...DEFAULT_VIEW, assigneeId: "user-2", isGroupedByAssignee: false }
     );
     await screen.findByRole("option", { name: "Bruno Lima" });
 
     await user.selectOptions(screen.getByRole("combobox", { name: "Responsável" }), "Todos");
 
     expect(onViewChange).toHaveBeenCalledWith({
+      ...DEFAULT_VIEW,
       assigneeId: undefined,
       isGroupedByAssignee: false,
     });
@@ -384,7 +424,7 @@ describe("ProjectBoard — board escolhido", () => {
   it("avisa quando o responsável escolhido não tem card no board", async () => {
     renderBoard(
       { boards: [allCardsDto], columns: emptyColumnsDto },
-      { assigneeId: "user-2", isGroupedByAssignee: false }
+      { ...DEFAULT_VIEW, assigneeId: "user-2", isGroupedByAssignee: false }
     );
 
     expect(
@@ -495,7 +535,11 @@ describe("ProjectBoard — administração do board", () => {
     await user.click(dialog.getByRole("button", { name: "Criar board" }));
 
     await waitFor(() =>
-      expect(onViewChange).toHaveBeenCalledWith({ boardId: "board-2", isGroupedByAssignee: false })
+      expect(onViewChange).toHaveBeenCalledWith({
+        ...DEFAULT_VIEW,
+        boardId: "board-2",
+        isGroupedByAssignee: false,
+      })
     );
     expect(api.post).toHaveBeenCalledWith("/api/v1/boards", {
       project_id: "project-1",
@@ -600,7 +644,11 @@ describe("ProjectBoard — administração do board", () => {
     await user.click(dialog.getByRole("button", { name: "Excluir board" }));
 
     await waitFor(() =>
-      expect(onViewChange).toHaveBeenCalledWith({ boardId: undefined, isGroupedByAssignee: false })
+      expect(onViewChange).toHaveBeenCalledWith({
+        ...DEFAULT_VIEW,
+        boardId: undefined,
+        isGroupedByAssignee: false,
+      })
     );
     expect(api.delete).toHaveBeenCalledWith("/api/v1/boards/board-2");
     expect(toast.success).toHaveBeenCalledWith("O board Issues da Ana foi excluído.");

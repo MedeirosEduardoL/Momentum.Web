@@ -36,8 +36,17 @@ describe("toBoardSearch", () => {
     }
   );
 
-  it("ignora o que não é do board", () => {
-    expect(toBoardSearch({ pagina: 2, tipo: "issue" })).toEqual({});
+  it("mantém a visão, o modo de lista e os filtros da lista válidos da URL", () => {
+    expect(toBoardSearch({ nivel: "epics", exibir: "lista", pagina: 2, tipo: "issue" })).toEqual({
+      nivel: "epics",
+      exibir: "lista",
+      pagina: 2,
+      tipo: "issue",
+    });
+  });
+
+  it.each(["cards", "hierarquia", "Features", 1])("descarta a visão %j, que não existe", nivel => {
+    expect(toBoardSearch({ nivel, exibir: "board" })).toEqual({});
   });
 });
 
@@ -45,6 +54,8 @@ describe("toBoardView", () => {
   it("sem nada na URL, mostra o primeiro board, todos os responsáveis e sem agrupar", () => {
     expect(toBoardView({})).toEqual({
       boardId: undefined,
+      level: "cards",
+      isList: false,
       assigneeId: undefined,
       isGroupedByAssignee: false,
     });
@@ -53,6 +64,8 @@ describe("toBoardView", () => {
   it("leva o board, o responsável e o agrupamento da URL para a tela", () => {
     expect(toBoardView({ board: BOARD_ID, responsavel: USER_ID, agrupar: "responsavel" })).toEqual({
       boardId: BOARD_ID,
+      level: "cards",
+      isList: false,
       assigneeId: USER_ID,
       isGroupedByAssignee: true,
     });
@@ -61,6 +74,8 @@ describe("toBoardView", () => {
   it("leva o pedido de sem responsável para a tela, sem pessoa escolhida", () => {
     expect(toBoardView({ responsavel: "nenhum" })).toEqual({
       boardId: undefined,
+      level: "cards",
+      isList: false,
       assigneeId: undefined,
       isUnassigned: true,
       isGroupedByAssignee: false,
@@ -70,17 +85,38 @@ describe("toBoardView", () => {
 
 describe("fromBoardView", () => {
   it("deixa a URL limpa quando a tela está no padrão", () => {
-    expect(toBoardSearch(fromBoardView({ isGroupedByAssignee: false }))).toEqual({});
+    expect(
+      toBoardSearch(fromBoardView({ level: "cards", isList: false, isGroupedByAssignee: false }))
+    ).toEqual({});
   });
 
   it("escreve na URL o board, o responsável e o agrupamento escolhidos", () => {
     expect(
-      fromBoardView({ boardId: BOARD_ID, assigneeId: USER_ID, isGroupedByAssignee: true })
-    ).toEqual({ board: BOARD_ID, responsavel: USER_ID, agrupar: "responsavel" });
+      fromBoardView({
+        boardId: BOARD_ID,
+        level: "features",
+        isList: true,
+        assigneeId: USER_ID,
+        isGroupedByAssignee: true,
+      })
+    ).toEqual({
+      board: BOARD_ID,
+      nivel: "features",
+      exibir: "lista",
+      responsavel: USER_ID,
+      agrupar: "responsavel",
+    });
   });
 
   it("escreve na URL o pedido de só os cards sem responsável", () => {
-    expect(fromBoardView({ isUnassigned: true, isGroupedByAssignee: false })).toEqual({
+    expect(
+      fromBoardView({
+        level: "cards",
+        isList: false,
+        isUnassigned: true,
+        isGroupedByAssignee: false,
+      })
+    ).toEqual({
       board: undefined,
       responsavel: "nenhum",
       agrupar: undefined,

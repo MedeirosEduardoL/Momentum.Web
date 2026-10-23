@@ -1,25 +1,24 @@
-import type { GroupsView } from "@/features/feature";
+import type { BoardSearch } from "./board-search";
 
-type SecondaryView = Exclude<GroupsView, "features">;
+type FormerView = "epics" | "hierarquia";
 
 export type GroupsSearch = {
-  visao?: SecondaryView;
+  visao?: FormerView;
 };
 
-const SECONDARY_VIEWS: Record<SecondaryView, true> = { epics: true, hierarquia: true };
+const FORMER_VIEWS: Record<FormerView, true> = { epics: true, hierarquia: true };
 
-function isSecondaryView(value: unknown): value is SecondaryView {
-  return typeof value === "string" && Object.hasOwn(SECONDARY_VIEWS, value);
+function isFormerView(value: unknown): value is FormerView {
+  return typeof value === "string" && Object.hasOwn(FORMER_VIEWS, value);
 }
 
 export function toGroupsSearch(search: Record<string, unknown>): GroupsSearch {
-  return { visao: isSecondaryView(search.visao) ? search.visao : undefined };
+  return { visao: isFormerView(search.visao) ? search.visao : undefined };
 }
 
-export function toGroupsView(search: GroupsSearch): GroupsView {
-  return search.visao ?? "features";
-}
-
-export function fromGroupsView(view: GroupsView): GroupsSearch {
-  return { visao: view === "features" ? undefined : view };
+export function toBoardGroupsSearch({ visao }: GroupsSearch): BoardSearch {
+  return {
+    nivel: visao === "epics" ? "epics" : "features",
+    exibir: visao === "hierarquia" ? "lista" : undefined,
+  };
 }

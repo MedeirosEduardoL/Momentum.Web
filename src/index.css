@@ -38,6 +38,8 @@
   --color-type-spike: oklch(0.55 0.15 305);
   --color-type-issue: oklch(0.55 0.18 22);
   --color-type-tech-debt: oklch(0.62 0.13 70);
+  --color-type-feature: oklch(0.52 0.19 300);
+  --color-type-epic: oklch(0.6 0.13 88);
 
   --font-*: initial;
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
@@ -128,6 +130,8 @@
     --color-type-spike: oklch(0.72 0.13 305);
     --color-type-issue: oklch(0.7 0.16 22);
     --color-type-tech-debt: oklch(0.8 0.13 80);
+    --color-type-feature: oklch(0.72 0.15 300);
+    --color-type-epic: oklch(0.82 0.15 88);
     --shadow-overlay: 0 16px 40px -8px oklch(0 0 0 / 0.55);
   }
 

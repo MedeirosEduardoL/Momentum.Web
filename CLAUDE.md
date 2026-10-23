@@ -9,11 +9,11 @@ repositório irmão em `../Momentum.Core`, pelo contrato `openapi.json` gerado l
 **Estado (2026-10-22): Fase 3, as telas das Fases 4 a 8 e o beta (Fase 11) entregues no Web.**
 Existem as telas de cadastro, confirmação de e-mail, login, troca de senha, primeiro acesso,
 aceite de convite, a lista de projetos, a área da organização (membros, convites, projetos, o
-time e os estados de cada projeto), os boards do projeto como tela principal (colunas por
-estado, arrastar entre colunas e raias, menu de três pontos no cartão, acesso por board), o card
-aberto em modal com guias (detalhes, relações, anexos, entrevista com IA e briefing) sobre o board
-e a lista, a lista de cards, os formulários de card, as telas de feature e de epic, com os boards
-de features e de epics ao lado da hierarquia, e os anexos de card, subitem, feature e epic, com
+time e os estados de cada projeto), os boards do projeto como tela principal e único hub (colunas
+por estado, arrastar entre colunas e raias, menu de três pontos no cartão, acesso por board e as
+visões de lista de cards, features e epics), o card aberto em modal com guias (detalhes, relações,
+anexos, entrevista com IA e briefing), os formulários de card, as telas de feature e de epic e os
+anexos de card, subitem, feature e epic, com
 sessão e guard de rota, no layout com a paleta do Megabrain, o acabamento do Linear e do YouTrack
 e o comportamento do Azure DevOps (`DESIGN.md`), tema claro e escuro; os chamados e a análise de
 código ainda não. As regras descrevem a

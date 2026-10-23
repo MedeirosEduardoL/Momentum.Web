@@ -48,6 +48,14 @@ export async function listFeatures(projectId: string): Promise<FeatureSummary[]>
   return response.data.map(toFeatureSummary);
 }
 
+export async function listBoardFeatures(boardId: string): Promise<FeatureSummary[]> {
+  const response = await api.get<FeatureSummaryDto[]>(
+    fillPath("/api/v1/boards/{boardId}/features", { boardId })
+  );
+
+  return response.data.map(toFeatureSummary);
+}
+
 export async function getFeature(featureId: string): Promise<Feature> {
   const response = await api.get<FeatureDto>(featurePath(featureId));
 

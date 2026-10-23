@@ -145,13 +145,13 @@ function toCardPage(dto: CardPageDto): CardPage {
 
 function toListParams(query: CardListQuery): CardListParams {
   return {
-    project_id: query.projectId,
+    project_id: "projectId" in query ? query.projectId : undefined,
     card_type: query.type,
     card_state_id: query.stateId,
     assignee_id: query.assigneeId,
     unassigned: query.isUnassigned || undefined,
     feature_id: query.featureId,
-    q: query.search,
+    q: "search" in query ? query.search : undefined,
     archived: query.includesArchived || undefined,
     page: query.page,
     page_size: CARDS_PER_PAGE,
@@ -185,8 +185,16 @@ function toTypeFieldsPayload(fields: CardTypeFields): TypeFieldsPayload {
   }
 }
 
+function listPathOf(query: CardListQuery) {
+  return "boardId" in query
+    ? fillPath("/api/v1/boards/{boardId}/cards", { boardId: query.boardId })
+    : CARDS_PATH;
+}
+
 export async function listCards(query: CardListQuery): Promise<CardPage> {
-  const response = await api.get<CardPageDto>(CARDS_PATH, { params: toListParams(query) });
+  const response = await api.get<CardPageDto>(listPathOf(query), {
+    params: toListParams(query),
+  });
   return toCardPage(response.data);
 }
 

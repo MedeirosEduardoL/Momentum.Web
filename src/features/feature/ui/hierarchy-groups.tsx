@@ -27,8 +27,8 @@ export function HierarchyGroups({
     <>
       {isEmptyHierarchy(hierarchy) && (
         <Notice>
-          Este projeto ainda não tem epic nem feature. Crie uma feature para agrupar os cards de uma
-          entrega, e um epic para agrupar features.
+          Este board ainda não mostra epic nem feature. Crie uma feature para agrupar os cards de
+          uma entrega, e um epic para agrupar features.
         </Notice>
       )}
       {hierarchy.epics.map(({ epic, features }) => (

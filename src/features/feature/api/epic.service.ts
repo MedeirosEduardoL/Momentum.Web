@@ -37,6 +37,14 @@ export async function listEpics(projectId: string): Promise<EpicSummary[]> {
   return response.data.map(toEpicSummary);
 }
 
+export async function listBoardEpics(boardId: string): Promise<EpicSummary[]> {
+  const response = await api.get<EpicSummaryDto[]>(
+    fillPath("/api/v1/boards/{boardId}/epics", { boardId })
+  );
+
+  return response.data.map(toEpicSummary);
+}
+
 export async function getEpic(epicId: string): Promise<Epic> {
   const response = await api.get<EpicDto>(epicPath(epicId));
 

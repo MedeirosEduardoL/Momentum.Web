@@ -11,7 +11,7 @@ Aqui fica o que o código não conta.
 
 | Rota | Tela | Por que este caminho |
 | --- | --- | --- |
-| `/projetos/$projectId/features` | Features e epics do projeto, em três guias (`?visao=`): board de features (padrão), board de epics (`epics`) e hierarquia (`hierarquia`) | É irmã de `/projetos/$projectId/cards`: a tela é de um projeto. O nome é o da feature, que é quem agrupa cards; o epic aparece na mesma tela. |
+| `/projetos/$projectId/boards?nivel=features` (ou `epics`, com `exibir=lista` para a hierarquia) | Features e epics de um board, como visões dele | Desde 2026-10-22 ficam no board, no recorte e no acesso dele (ADR 0009 do Core), lidos de `GET /api/v1/boards/{boardId}/features` e `/epics`. `/projetos/$projectId/features?visao=` só redireciona para cá. |
 | `/features/$featureId` | Feature | A feature se acha pelo id, como em `GET /api/v1/features/{featureId}`; o card aponta para cá sem saber o projeto. |
 | `/epics/$epicId` | Epic | O mesmo, para `GET /api/v1/epics/{epicId}`. |
 | `/projetos/$projectId/epics/novo` | Criar epic | O epic nasce num projeto, como o card em `/projetos/$projectId/cards/novo`. Não existe `/projetos/$projectId/epics`: a lista é a hierarquia. |
@@ -47,11 +47,15 @@ Aqui fica o que o código não conta.
 
 ## Fluxos
 
+- **No board** (passo 11.12). Os três itens abaixo são visões do board: "Visão" Features ou Epics
+  e "Ver como lista" para a hierarquia. Os links de criar, abrir e "Cards" moram em
+  `widgets/group-links.tsx`, usados pelo board e pelas telas de feature e de epic.
 - **Board de features e board de epics** (passo 11.8). Três colunas fixas, pelo estado derivado
   (A fazer, Em andamento, Concluída), com a contagem e o traço no tom; cada cartão traz o tipo
   ("Feature" ou "Epic"), o título (link para a tela do item), a barra de progresso e um resumo (o
-  epic e a quantidade de cards da feature; a quantidade de features e de cards do epic). Sem
-  arrastar: o estado é derivado dos cards. O cabeçalho tem "Nova feature" e "Novo epic".
+  epic e a quantidade de cards da feature; a quantidade de features e de cards do epic), com a
+  borda esquerda roxa na feature e dourada no epic. Sem arrastar: o estado é derivado dos cards.
+  Acima das colunas, "Nova feature" e "Novo epic".
 - **Hierarquia.** Na largura toda da área de conteúdo. Uma seção por epic, na ordem de criação, com o título (link para o epic), o
   estado derivado, o progresso e as quantidades de features e de cards; dentro dela, as features
   do epic. Por último, "Features sem epic". Cada feature mostra título (link), estado derivado,

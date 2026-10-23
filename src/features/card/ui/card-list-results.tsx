@@ -29,7 +29,7 @@ export function CardListResults({ query, onPageChange, renderCardLink }: CardLis
             <EmptyState
               icon={<StickyNote className="size-6" />}
               title="Nenhum card por aqui"
-              description="Crie um card neste projeto ou mude os filtros da lista."
+              description="Nenhum card do board casa com estes filtros: mude os filtros ou crie um card."
             />
           ) : (
             <div

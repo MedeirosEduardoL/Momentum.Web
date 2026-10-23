@@ -5,9 +5,9 @@ import { ButtonLink } from "@/shared/ui/button-link";
 import {
   renderFeatureCardsLink,
   renderFeatureLink,
-  reportingHierarchyLink,
   renderNewEpicFeatureLink,
-} from "../feature-links";
+} from "@/widgets/group-links";
+import { reportingHierarchyLink } from "../feature-links";
 
 type EpicDetailPageProps = {
   epicId: string;

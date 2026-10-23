@@ -1,6 +1,7 @@
-import { useState, type DragEventHandler, type ReactNode } from "react";
+import { useRef, useState, type DragEventHandler, type ReactNode } from "react";
 import { cn } from "@/shared/lib/cn";
 import { SelectField, type SelectOption } from "@/shared/ui/select-field";
+import { useOutsidePress } from "@/shared/ui/use-outside-press";
 import { CARD_TYPE_EDGE_CLASSES } from "../model/lib/card-type-colors";
 import type { CardMoveHandler, CardSummary, CardTaskKind } from "../model/types/card.types";
 import { CardAssigneeChip } from "./card-assignee-chip";
@@ -37,6 +38,19 @@ export function CardTile({
 }: CardTileProps) {
   const [openKind, setOpenKind] = useState<CardTaskKind | null>(null);
   const [addingKind, setAddingKind] = useState<CardTaskKind | null>(null);
+  const tileRef = useRef<HTMLLIElement>(null);
+
+  useOutsidePress({
+    isActive: openKind !== null,
+    refs: [tileRef],
+    ignoresOverlays: true,
+    onOutsidePress: closeSubitems,
+  });
+
+  function closeSubitems() {
+    setAddingKind(null);
+    setOpenKind(null);
+  }
 
   function toggleKind(kind: CardTaskKind) {
     setAddingKind(null);
@@ -50,6 +64,7 @@ export function CardTile({
 
   return (
     <li
+      ref={tileRef}
       draggable={!isLocked && openKind === null}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}

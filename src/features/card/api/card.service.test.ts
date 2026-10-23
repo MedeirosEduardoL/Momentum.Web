@@ -106,6 +106,18 @@ describe("listCards", () => {
     ).resolves.toEqual({ cards: [summary], page: 2, totalPages: 3 });
   });
 
+  it("pede os cards de um board pela rota do board, sem o projeto", async () => {
+    vi.mocked(api.get).mockResolvedValue({
+      data: { items: [], page: 1, page_size: 20, total_count: 0 },
+    });
+
+    await listCards({ boardId: "board-1", stateId: "state-1", includesArchived: false, page: 1 });
+
+    expect(api.get).toHaveBeenCalledWith("/api/v1/boards/board-1/cards", {
+      params: { card_state_id: "state-1", page: 1, page_size: 20 },
+    });
+  });
+
   it("manda o projeto, a página e só os filtros escolhidos", async () => {
     vi.mocked(api.get).mockResolvedValue({
       data: { items: [], page: 1, page_size: 20, total_count: 0 },

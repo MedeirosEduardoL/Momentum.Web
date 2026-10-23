@@ -1,6 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { api } from "@/shared/api/client";
-import { createEpic, deleteEpic, getEpic, listEpics, updateEpic } from "./epic.service";
+import {
+  createEpic,
+  deleteEpic,
+  getEpic,
+  listBoardEpics,
+  listEpics,
+  updateEpic,
+} from "./epic.service";
 
 vi.mock("@/shared/api/client", () => ({
   api: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
@@ -44,6 +51,15 @@ describe("listEpics", () => {
 
     await expect(listEpics("project-1")).resolves.toEqual([summary]);
     expect(api.get).toHaveBeenCalledWith("/api/v1/epics", { params: { project_id: "project-1" } });
+  });
+});
+
+describe("listBoardEpics", () => {
+  it("lista os epics de um board pela rota do board", async () => {
+    vi.mocked(api.get).mockResolvedValue({ data: [summaryDto] });
+
+    await expect(listBoardEpics("board-1")).resolves.toEqual([summary]);
+    expect(api.get).toHaveBeenCalledWith("/api/v1/boards/board-1/epics");
   });
 });
 

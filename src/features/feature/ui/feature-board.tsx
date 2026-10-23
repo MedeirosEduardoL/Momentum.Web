@@ -27,7 +27,7 @@ export function FeatureBoard({ features, epics, renderFeatureLink }: FeatureBoar
       renderTile={feature => (
         <GroupTile
           key={feature.id}
-          kindLabel="Feature"
+          kind="feature"
           titleLink={renderFeatureLink(feature)}
           progressLabel={`Progresso de ${feature.title}`}
           progress={feature.progress}

@@ -12,14 +12,16 @@ conta.
 
 | Rota | Tela | Por que este caminho |
 | --- | --- | --- |
-| `/projetos/$projectId/boards` | Boards do projeto, com um board aberto | É irmã de `/projetos/$projectId/cards` e de `/projetos/$projectId/features`: os boards são de um projeto, e o seletor precisa da lista deles. |
+| `/projetos/$projectId/boards` | Boards do projeto, com um board aberto numa das visões (colunas, lista de cards, features, epics) | Os boards são de um projeto, e o seletor precisa da lista deles. Desde 2026-10-22 é o único hub do projeto: `/projetos/$projectId/cards` e `/projetos/$projectId/features` só redirecionam para as visões daqui (ADR 0009 do Core). |
 
 - Fica na área `member`. Chega-se a ela pelo nome do projeto e pelo link "Boards" na página
   inicial, pelo nome do projeto na aba "Projetos" da organização e pelo item "Boards" da navegação
   lateral; por isso a tela não tem link "Voltar".
 - O board aberto, o responsável, o agrupamento e o card aberto são parâmetros da URL: `board` (o id
   do board), `responsavel` (o id da pessoa, ou `nenhum` para só os cards sem responsável),
-  `agrupar=responsavel` e `card` (o id do card aberto na modal, passo 11.6). O padrão não vai para a URL: sem `board` vale o primeiro board do
+  `agrupar=responsavel`, `card` (o id do card aberto na modal, passo 11.6), `nivel` (`features` ou
+  `epics`; sem ele, cards), `exibir=lista` e, na lista de cards, `tipo`, `estado`, `feature`,
+  `arquivados` e `pagina`, os mesmos da antiga lista do projeto. O padrão não vai para a URL: sem `board` vale o primeiro board do
   projeto, na ordem de criação. `board` fica em inglês porque é o termo do glossário.
 - `app/routes/board-search.ts` valida a URL e traduz para a visão da feature (`BoardView`, com
   `assigneeId` ou `isUnassigned`), e de volta. O que não é id, `nenhum` nem `responsavel` é
@@ -91,6 +93,16 @@ conta.
   colunas são relidas. Um toast diz "O card MOM-12 foi criado." ou, se o card não voltou nas
   colunas relidas, "O card MOM-12 foi criado, mas não casa com o filtro deste board."; os dois
   têm "Abrir o card".
+- **Visões** (passo 11.12). "Visão" (Cards, Features, Epics) e "Ver como lista"/"Ver como board"
+  na barra. Trocar de board mantém a visão; trocar de visão limpa os filtros da lista. Cards em
+  lista é a tabela da antiga lista do projeto, com Tipo, Estado, Feature e Arquivados embaixo da
+  barra (o Responsável é o da barra); Features e Epics em board são as colunas pelo estado
+  derivado, com a borda roxa e dourada; em lista, a hierarquia, com "Nova feature" e "Novo epic".
+  Os dados vêm de `GET /api/v1/boards/{boardId}/cards`, `/features` e `/epics`, no recorte e no
+  acesso do board.
+- **Clicar fora do cartão** (passo 11.11). Com a lista de subitens aberta (pelo botão do tipo ou
+  pelo menu), um clique fora do cartão fecha a lista e o campo e descarta o que foi digitado.
+  Clique no subitem aberto num diálogo, no menu flutuante ou num toast não fecha.
 - **Abrir o card.** O título do cartão leva ao mesmo board com `card` na URL, e o card abre na
   modal (`OpenedCardDialog`), com as guias; fechar pelo X, Esc ou clique fora tira o `card` da URL
   e relê as colunas.
@@ -133,7 +145,7 @@ conta.
   Enquanto o time carrega, ou se a consulta falha, só há raia para quem tem card e, quando cabe, a
   de "Sem responsável".
 - **Coluna cortada.** Quando o total passa dos cards que vieram, o cabeçalho mostra "100 de N
-  cards" e o link "Ver na lista", para a lista de cards filtrada pelo estado e, se houver, pelo
+  cards" e o link "Ver na lista", para a lista do mesmo board filtrada pelo estado e, se houver, pelo
   responsável escolhido ou por "Sem responsável".
 - **Criar e editar.** Um diálogo com o nome e os cinco critérios, cada um num grupo de caixas de
   marcar: tipos de card, prioridades, responsáveis (o time), features e epics. Depois de criar, a

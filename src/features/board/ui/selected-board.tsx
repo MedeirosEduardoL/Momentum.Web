@@ -5,7 +5,7 @@ import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { Modal } from "@/shared/ui/modal";
 import { useConfirmation } from "@/shared/ui/use-confirmation";
 import { useRemoveBoard } from "../model/hooks/use-remove-board";
-import type { Board, BoardColumns, BoardView } from "../model/types/board.types";
+import type { Board, BoardColumns, BoardGroupsView, BoardView } from "../model/types/board.types";
 import { BoardAccessDialog } from "./board-access-dialog";
 import { BoardColumnsContent } from "./board-columns-content";
 import { BoardFilterOptionsContent } from "./board-filter-options-content";
@@ -20,8 +20,43 @@ type SelectedBoardProps = {
   canAdminister: boolean;
   onRemoving: (board: Board) => void;
   renderColumns: (columns: BoardColumns) => ReactNode;
+  renderCardList: (board: Board) => ReactNode;
+  renderGroups: (groups: BoardGroupsView) => ReactNode;
   columnsEditor: ReactNode;
 };
+
+type BoardContentProps = Pick<
+  SelectedBoardProps,
+  "board" | "view" | "renderColumns" | "renderCardList" | "renderGroups"
+>;
+
+function BoardContent({
+  board,
+  view,
+  renderColumns,
+  renderCardList,
+  renderGroups,
+}: BoardContentProps) {
+  if (view.level !== "cards") {
+    return renderGroups({ board, level: view.level, isList: view.isList });
+  }
+
+  if (view.isList) {
+    return renderCardList(board);
+  }
+
+  return (
+    <BoardColumnsContent
+      query={{
+        boardId: board.id,
+        assigneeId: view.assigneeId,
+        isUnassigned: view.isUnassigned,
+      }}
+      savedFilter={board.filter}
+      renderColumns={renderColumns}
+    />
+  );
+}
 
 export function SelectedBoard({
   boards,
@@ -31,6 +66,8 @@ export function SelectedBoard({
   canAdminister,
   onRemoving,
   renderColumns,
+  renderCardList,
+  renderGroups,
   columnsEditor,
 }: SelectedBoardProps) {
   const [isEditing, setIsEditing] = useState(false);
@@ -80,14 +117,12 @@ export function SelectedBoard({
           )
         }
       />
-      <BoardColumnsContent
-        query={{
-          boardId: board.id,
-          assigneeId: view.assigneeId,
-          isUnassigned: view.isUnassigned,
-        }}
-        savedFilter={board.filter}
+      <BoardContent
+        board={board}
+        view={view}
         renderColumns={renderColumns}
+        renderCardList={renderCardList}
+        renderGroups={renderGroups}
       />
       <Modal
         open={isEditing}

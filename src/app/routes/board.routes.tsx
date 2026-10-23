@@ -7,6 +7,7 @@ import {
   type AnyRoute,
 } from "@tanstack/react-router";
 import { fromBoardView, toBoardSearch, toBoardView } from "./board-search";
+import { fromCardListFilters, toCardListFilters } from "./card-list-search";
 import { withPagePreload } from "./with-page-preload";
 
 const ProjectBoardPage = lazyRouteComponent(() =>
@@ -27,6 +28,14 @@ function ProjectBoardRoute() {
           to: "/projetos/$projectId/boards",
           params: { projectId },
           search: fromBoardView(view),
+        })
+      }
+      listFilters={toCardListFilters(search)}
+      onListFiltersChange={filters =>
+        navigate({
+          to: "/projetos/$projectId/boards",
+          params: { projectId },
+          search: previous => ({ ...previous, ...fromCardListFilters(filters) }),
         })
       }
       openCardId={search.card}

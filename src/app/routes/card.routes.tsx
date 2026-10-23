@@ -1,18 +1,14 @@
 import {
   createRoute,
   lazyRouteComponent,
-  useNavigate,
+  Navigate,
   useParams,
   useSearch,
   type AnyRoute,
 } from "@tanstack/react-router";
 import { useProjectContextStore } from "@/app/stores/project-context.store";
-import { fromCardListFilters, toCardListFilters, toCardListSearch } from "./card-list-search";
+import { toCardListSearch } from "./card-list-search";
 import { withPagePreload } from "./with-page-preload";
-
-const CardListPage = lazyRouteComponent(() =>
-  import("@/pages/card").then(module => ({ default: module.CardListPage }))
-);
 
 const NewCardPage = lazyRouteComponent(() =>
   import("@/pages/card").then(module => ({ default: module.NewCardPage }))
@@ -26,30 +22,16 @@ const CardEditPage = lazyRouteComponent(() =>
   import("@/pages/card").then(module => ({ default: module.CardEditPage }))
 );
 
-function CardListRoute() {
+function CardListRedirect() {
   const { projectId } = useParams({ from: "/member/projetos/$projectId/cards" });
   const search = useSearch({ from: "/member/projetos/$projectId/cards" });
-  const navigate = useNavigate();
 
   return (
-    <CardListPage
-      projectId={projectId}
-      filters={toCardListFilters(search)}
-      onFiltersChange={filters =>
-        navigate({
-          to: "/projetos/$projectId/cards",
-          params: { projectId },
-          search: fromCardListFilters(filters),
-        })
-      }
-      openCardId={search.card}
-      onOpenCardChange={cardId =>
-        navigate({
-          to: "/projetos/$projectId/cards",
-          params: { projectId },
-          search: previous => ({ ...previous, card: cardId }),
-        })
-      }
+    <Navigate
+      to="/projetos/$projectId/boards"
+      params={{ projectId }}
+      search={{ ...search, exibir: "lista" }}
+      replace
     />
   );
 }
@@ -78,7 +60,7 @@ export function createCardRoutes<TMemberRoute extends AnyRoute>(memberRoute: TMe
     getParentRoute: () => memberRoute,
     path: "/projetos/$projectId/cards",
     validateSearch: toCardListSearch,
-    component: withPagePreload(CardListRoute, CardListPage),
+    component: CardListRedirect,
   });
 
   const newCardRoute = createRoute({
